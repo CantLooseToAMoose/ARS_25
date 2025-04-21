@@ -5,10 +5,10 @@ using UnityEngine;
 public class KalManPrediction
 {
     // State vector (x, y, theta)
-    private Vector3 stateEstimate;
+    public Vector3 stateEstimate;
 
     // Covariance matrix
-    private Matrix3x3 covarianceEstimate;
+    public Matrix3x3 covarianceEstimate;
 
     // Control input (linear velocity and angular velocity)
     private Vector2 control;
@@ -34,24 +34,38 @@ public class KalManPrediction
     // Control input matrix (will be computed based on the theta)
     private Matrix3x2 B;
 
-    // Process noise covariance matrix
+    // Observation matrix (identity for simplicity)
+    private Matrix3x3 C = new Matrix3x3(
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    );
+
+    // Noise covariance matrix for the motion model
     private Matrix3x3 R;
 
-    // 
+    // Noise covariance matrix for the observation model
+    private Matrix3x3 Q;
 
     // Constructor
-    public KalmanPrediction(float Rx = 0.1f, float Ry = 0.1f, float Rtheta = 0.1f, float deltaTime = 1.0f)
+    public KalmanPrediction(float Rx = 0.1f, float Ry = 0.1f, float Rtheta = 0.1f, float Qx = 0.1f, float Qy = 0.1f, float Qtheta = 0.1f)
     {
         this.Rx = Rx;
         this.Ry = Ry;
         this.Rtheta = Rtheta;
-        this.deltaTime = deltaTime;
 
-        // Process noise covariance matrix initialization
+        // Initialize the noise covariance matrix for the motion model
         this.R = new Matrix3x3(
             Rx, 0, 0,
             0, Ry, 0,
             0, 0, Rtheta
+        );
+
+        // Initialize the noise covariance matrix for the observation model
+        this.Q = new Matrix3x3(
+            Qx, 0, 0,
+            0, Qy, 0,
+            0, 0, Qtheta
         );
     }
 
@@ -66,11 +80,19 @@ public class KalManPrediction
     }
 
     // Kalman Filter update function (prediction and correction steps)
-    public void KalmanFilter(stateEstimate prevStateEstimate, covarianceEstimate prevCovarianceEstimate, control control, observation observation){
+    public void KalmanFilter(control control, observation observation){
+        stateEstimate prevStateEstimate = this.stateEstimate;
+        covarianceEstimate prevCovarianceEstimate = this.covarianceEstimate;
+        
         // Prediction step
         (stateEstimate, covarianceEstimate) = PredictionStep(prevStateEstimate, prevCovarianceEstimate, control)
 
+        // Correction step
+        (correctedStateEstimate, correctedCovarianceEstimate) = CorrectionStep(stateEstimate, covarianceEstimate, observation);
 
+        // Update the state and covariance estimates
+        this.stateEstimate = correctedStateEstimate;
+        this.covarianceEstimate = correctedCovarianceEstimate;
     }
 
     // Prediction step of the Kalman Filter
@@ -100,6 +122,3 @@ public class KalManPrediction
         return (correctedStateEstimate, correctedCovarianceEstimate)
     }
 }
-
-
-// TODO initialize: C, Q
