@@ -1,102 +1,85 @@
-using System;
 using UnityEngine;
-using MathNet.Numerics.LinearAlgebra;
+using Unity.Mathematics;
 
 public class KalmanPrediction
 {
-    // State vector [x, y, theta]
-    public Vector<float> stateEstimate;
+    public float3 stateEstimate;
+    public float3x3 covarianceEstimate;
 
-    // Covariance matrix
-    public Matrix<float> covarianceEstimate;
-
-    // Time step
     public float deltaTime;
 
-    // Matrices
-    private Matrix<float> A;
-    private Matrix<float> C;
-    private Matrix<float> R;
-    private Matrix<float> Q;
 
-    // Constructor
-    public KalmanPrediction(float deltaTime = 0.1f, float Rx = 0.1f, float Ry = 0.1f, float Rtheta = 0.1f, float Qx = 0.1f, float Qy = 0.1f, float Qtheta = 0.1f)
+    private float3x3 A = float3x3.identity;
+    private float3x3 C = float3x3.identity;
+
+    private float3x3 R;
+    private float3x3 Q;
+
+    public KalmanPrediction(
+        float deltaTime = 0.1f,
+        float Rx = 0.1f,
+        float Ry = 0.1f,
+        float Rtheta = 0.1f,
+        float Qx = 0.1f,
+        float Qy = 0.1f,
+        float Qtheta = 0.1f
+    )
     {
         this.deltaTime = deltaTime;
-        this.Rx = Rx;
-        this.Ry = Ry;
-        this.Rtheta = Rtheta;
 
-        // Initial state and covariance
-        stateEstimate = Vector<float>.Build.DenseOfArray(new float[] { 0f, 0f, 0f });
-        covarianceEstimate = Matrix<float>.Build.DenseIdentity(3);
+        R = new float3x3(
+            Rx, 0f, 0f,
+            0f, Ry, 0f,
+            0f, 0f, Rtheta
+        );
 
-        // State transition matrix (identity)
-        A = Matrix<float>.Build.DenseIdentity(3);
+        Q = new float3x3(
+            Qx, 0f, 0f,
+            0f, Qy, 0f,
+            0f, 0f, Qtheta
+        );
 
-        // Observation matrix (identity)
-        C = Matrix<float>.Build.DenseIdentity(3);
-
-        // Motion noise covariance
-        R = Matrix<float>.Build.DenseOfArray(new float[,] {
-            { Rx, 0f, 0f },
-            { 0f, Ry, 0f },
-            { 0f, 0f, Rtheta }
-        });
-
-        // Observation noise covariance
-        Q = Matrix<float>.Build.DenseOfArray(new float[,] {
-            { Qx, 0f, 0f },
-            { 0f, Qy, 0f },
-            { 0f, 0f, Qtheta }
-        });
+        stateEstimate = float3.zero;
+        covarianceEstimate = float3x3.identity;
     }
 
-    // Compute control matrix B
-    private Matrix<float> ComputeB(float theta)
+    private float3x2 ComputeB(float theta)
     {
-        return Matrix<float>.Build.DenseOfArray(new float[,] {
-            { deltaTime * Mathf.Cos(theta), 0f },
-            { deltaTime * Mathf.Sin(theta), 0f },
-            { 0f, deltaTime }
-        });
+        return new float3x2(
+            deltaTime * math.cos(theta), 0f,
+            deltaTime * math.sin(theta), 0f,
+            0f, deltaTime
+        );
     }
 
-    // Kalman Filter update function
-    public void KalmanFilter(Vector<float> control, Vector<float> observation)
+    public void KalmanFilter(float2 control, float3 observation)
     {
-        // Prediction
         var (predState, predCov) = PredictionStep(stateEstimate, covarianceEstimate, control);
-
-        // Correction
         var (corrState, corrCov) = CorrectionStep(predState, predCov, observation);
 
-        // Update state
         stateEstimate = corrState;
         covarianceEstimate = corrCov;
     }
 
-    // Prediction step
-    private (Vector<float>, Matrix<float>) PredictionStep(Vector<float> prevState, Matrix<float> prevCov, Vector<float> control)
+    private (float3, float3x3) PredictionStep(float3 prevState, float3x3 prevCov, float2 control)
     {
-        float theta = prevState[2];
-        Matrix<float> B = ComputeB(theta);
+        float theta = prevState.z;
+        float3x2 B = ComputeB(theta);
 
-        Vector<float> predictedState = A * prevState + B * control;
-        Matrix<float> predictedCovariance = A * prevCov * A.Transpose() + R;
+        float3 predictedState = math.mul(A, prevState) + math.mul(B, control);
+        float3x3 predictedCov = math.mul(math.mul(A, prevCov), math.transpose(A)) + R;
 
-        return (predictedState, predictedCovariance);
+        return (predictedState, predictedCov);
     }
 
-    // Correction step
-    private (Vector<float>, Matrix<float>) CorrectionStep(Vector<float> predictedState, Matrix<float> predictedCov, Vector<float> observation)
+    private (float3, float3x3) CorrectionStep(float3 predictedState, float3x3 predictedCov, float3 observation)
     {
-        Matrix<float> S = C * predictedCov * C.Transpose() + Q;
-        Matrix<float> K = predictedCov * C.Transpose() * S.Inverse();
+        float3x3 S = math.mul(math.mul(C, predictedCov), math.transpose(C)) + Q;
+        float3x3 K = math.mul(math.mul(predictedCov, math.transpose(C)), math.inverse(S));
 
-        Vector<float> updatedState = predictedState + K * (observation - C * predictedState);
-        Matrix<float> updatedCovariance = (Matrix<float>.Build.DenseIdentity(3) - K * C) * predictedCov;
+        float3 updatedState = predictedState + math.mul(K, observation - math.mul(C, predictedState));
+        float3x3 updatedCov = math.mul(float3x3.identity - math.mul(K, C), predictedCov);
 
-        return (updatedState, updatedCovariance);
+        return (updatedState, updatedCov);
     }
 }
