@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,9 +44,15 @@ public class LidarSensors : MonoBehaviour
         public bool hit;
     }
 
+    private void Update()
+    {
+        Vector3 origin = transform.position;
+        RaycastResult[] rayResults = PerformRaycasts(origin);
+    }
+
     void OnDrawGizmosSelected()
     {
-        Vector3 origin = transform.position; // 🔄 CHANGED: no offset added here
+        Vector3 origin = transform.position;
         RaycastResult[] rayResults = PerformRaycasts(origin);
 
 #if UNITY_EDITOR
@@ -60,7 +67,7 @@ public class LidarSensors : MonoBehaviour
 
         foreach (var result in rayResults)
         {
-            Vector3 rayStart = origin + result.direction * radiusOffset; // 🔄 Start gizmo from radius offset
+            Vector3 rayStart = origin + result.direction * radiusOffset; 
 
             if (result.hit)
             {
@@ -92,14 +99,14 @@ public class LidarSensors : MonoBehaviour
             bool hitSomething = Physics.Raycast(origin, direction, out hit, maxLength, sensorMask);
 
             float rawDistance = hitSomething ? hit.distance : maxLength;
-            float adjustedDistance = Mathf.Max(0f, rawDistance - radiusOffset); // 🔄 Subtract offset from measured distance
+            float adjustedDistance = Mathf.Max(0f, rawDistance - radiusOffset); 
 
             results[i] = new RaycastResult
             {
                 direction = direction,
                 hit = hitSomething,
                 distance = adjustedDistance,
-                hitPoint = origin + direction * rawDistance // 🔄 Optional: could use adjusted if drawing from offset
+                hitPoint = origin + direction * rawDistance 
             };
         }
 

@@ -24,6 +24,16 @@ public class SimpleMovement : MonoBehaviour
         ApplyRotation();
     }
 
+    public float GetForwardVelocity()
+    {
+        return speed * moveInput;
+    }
+
+    public float GetRotationalVelocity()
+    {
+        return rotationSpeed * rotationInput;
+    }
+
     // --- Public API Methods ---
 
     public void Move(float input)
@@ -66,7 +76,6 @@ public class SimpleMovement : MonoBehaviour
 
         float velocityMag = rb.velocity.magnitude;
 
-        // This is the rotation speed you're commanding (in degrees/sec)
         float angularVelocityDeg = rotationInput * rotationSpeed;
 
         string text = $"Vel: {velocityMag:F2} m/s\nAngVel: {angularVelocityDeg:F2} °/s";
@@ -82,5 +91,4 @@ public class SimpleMovement : MonoBehaviour
         Handles.Label(labelPos, text, style);
 #endif
     }
-
 }

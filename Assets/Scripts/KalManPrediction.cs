@@ -61,7 +61,7 @@ public class KalmanPrediction
         covarianceEstimate = corrCov;
     }
 
-    private (float3, float3x3) PredictionStep(float3 prevState, float3x3 prevCov, float2 control)
+    public (float3, float3x3) PredictionStep(float3 prevState, float3x3 prevCov, float2 control)
     {
         float theta = prevState.z;
         float3x2 B = ComputeB(theta);
@@ -72,7 +72,7 @@ public class KalmanPrediction
         return (predictedState, predictedCov);
     }
 
-    private (float3, float3x3) CorrectionStep(float3 predictedState, float3x3 predictedCov, float3 observation)
+    public (float3, float3x3) CorrectionStep(float3 predictedState, float3x3 predictedCov, float3 observation)
     {
         float3x3 S = math.mul(math.mul(C, predictedCov), math.transpose(C)) + Q;
         float3x3 K = math.mul(math.mul(predictedCov, math.transpose(C)), math.inverse(S));

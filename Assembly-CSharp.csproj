@@ -41,10 +41,15 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\SimpleMovement.cs" />
     <Compile Include="Assets\Scripts\PlayerInputController.cs" />
-    <Compile Include="Assets\Scripts\LidarSensors.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\LidarSensors.cs" />
+    <Compile Include="Assets\Scripts\SimpleMovement.cs" />
+    <Compile Include="Assets\Scripts\LandmarkDetector.cs" />
+    <Compile Include="Assets\Scripts\Landmark.cs" />
+    <Compile Include="Assets\Scripts\KalManPrediction.cs" />
+    <Compile Include="Assets\Scripts\Localizer.cs" />
+    <Compile Include="Assets\AgentTrajectory.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.45f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
@@ -663,6 +668,9 @@
     <Reference Include="System.Xml.Serialization">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.45f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Flow.Editor">
       <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
@@ -699,6 +707,9 @@
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Mathematics.Editor">
+      <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
@@ -731,12 +742,6 @@
     </Reference>
     <Reference Include="Unity.EditorCoroutines.Editor">
       <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Mathematics.Editor">
-      <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Mathematics">
-      <HintPath>E:\Unity Games\ARS 25\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
