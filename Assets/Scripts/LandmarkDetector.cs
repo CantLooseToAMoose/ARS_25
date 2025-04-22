@@ -1,6 +1,22 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Numerics;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
+public struct TriangulationAnchor
+{
+    public Vector2 pos;   
+    public float   r;
+    public int signature;
+
+    public TriangulationAnchor(Vector2 p, float range, int s)
+    {
+        pos = p;
+        r   = range;
+        signature = s;
+    }
+}
 public struct LandmarkMeasurement
 {
     public float range;
@@ -27,16 +43,21 @@ public class LandmarkDetector : MonoBehaviour
 
     private List<(Vector3, Vector3, bool)> debugRaycasts = new List<(Vector3, Vector3, bool)>();
     public List<LandmarkMeasurement> measurements = new List<LandmarkMeasurement>();
+    public  List<TriangulationAnchor> triangulationAnchors = new();
+    public Vector3 Observation { get; private set; }
 
     private void Update()
     {
         DetectVisibleLandmarks();
+        var triangulation = new Triangulation(triangulationAnchors, measurements);
+        Observation = triangulation.GetObservation();
     }
 
     private void DetectVisibleLandmarks()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRadius, landmarkLayer);
         measurements.Clear();
+        triangulationAnchors.Clear();
         debugRaycasts.Clear();
 
         Vector3 agentPos = transform.position;
@@ -66,6 +87,7 @@ public class LandmarkDetector : MonoBehaviour
                     phi = Mathf.Repeat(phi + Mathf.PI, 2 * Mathf.PI) - Mathf.PI;
 
                     measurements.Add(new LandmarkMeasurement(r, phi, landmark.signature));
+                    triangulationAnchors.Add(new TriangulationAnchor(new Vector2(landmarkPos.x, landmarkPos.z),r ,landmark.signature));
                     //
                     // if (showDebug)
                     //     Debug.Log($"Landmark: {landmark.name}, r: {r:F2}, φ: {phi * Mathf.Rad2Deg:F1}°, s: {landmark.signature}");

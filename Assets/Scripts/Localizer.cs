@@ -10,6 +10,7 @@ public class Localizer : MonoBehaviour
 {
     public SimpleMovement movement;
     public KalmanPrediction kalmanPrediction;
+    public LandmarkDetector landmarkDetector;
     public float3 stateEstimate = new float3();
     public float3x3 covarianceEstimate = new float3x3();
 
@@ -25,6 +26,7 @@ public class Localizer : MonoBehaviour
     private void Start()
     {
         kalmanPrediction = new KalmanPrediction();
+        landmarkDetector = GetComponent<LandmarkDetector>();
     }
 
     private void Update()
@@ -33,8 +35,18 @@ public class Localizer : MonoBehaviour
         var control = new float2(movement.GetForwardVelocity(), movement.GetRotationalVelocity());
         control.y = Mathf.Deg2Rad * control.y; // Convert rotation to radians
         var prediction = kalmanPrediction.PredictionStep(stateEstimate, covarianceEstimate, control);
-        stateEstimate = prediction.Item1;
-        covarianceEstimate = prediction.Item2;
+        if (landmarkDetector.triangulationAnchors.Count < 3)
+        {
+            stateEstimate = prediction.Item1;
+            covarianceEstimate = prediction.Item2;
+        }
+        else
+        {
+            Vector3 z = landmarkDetector.Observation;   
+            var correctedPrediction = kalmanPrediction.CorrectionStep(stateEstimate, covarianceEstimate, (float3)z);
+            stateEstimate = correctedPrediction.Item1;
+            covarianceEstimate = correctedPrediction.Item2;
+        }
         trajectoryPoints.Add(new Vector3(stateEstimate.y, 0, stateEstimate.x));
     }
 
