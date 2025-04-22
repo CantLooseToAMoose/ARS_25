@@ -14,18 +14,13 @@ public class Localizer : MonoBehaviour
     public float3 stateEstimate = new float3();
     public float3x3 covarianceEstimate = new float3x3();
 
-    [Header("Prediction Settings")] public int predictionSteps = 20; // 🔥 Number of steps to look ahead
-    public float predictionStepTime = 0.1f; // 🔥 Time per step
-    public Color predictedColor = Color.blue; // 🔥 Color of prediction line
 
-    // Estimate Trajectory
-    [Header("Debug Settings")]
-    private List<Vector3> trajectoryPoints = new List<Vector3>();
-    public float dotSpacing = 4f;    // Spacing between dots in pixels
+    [Header("Debug Settings")] private List<Vector3> trajectoryPoints = new List<Vector3>();
+    public float dotSpacing = 4f;
 
     private void Start()
     {
-        kalmanPrediction = new KalmanPrediction();
+        kalmanPrediction = new KalmanPrediction(0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f);
         landmarkDetector = GetComponent<LandmarkDetector>();
     }
 
@@ -33,20 +28,20 @@ public class Localizer : MonoBehaviour
     {
         kalmanPrediction.deltaTime = Time.deltaTime;
         var control = new float2(movement.GetForwardVelocity(), movement.GetRotationalVelocity());
-        control.y = Mathf.Deg2Rad * control.y; // Convert rotation to radians
+        control.y = Mathf.Deg2Rad * control.y;
         var prediction = kalmanPrediction.PredictionStep(stateEstimate, covarianceEstimate, control);
-        if (landmarkDetector.triangulationAnchors.Count < 3)
+        stateEstimate = prediction.Item1;
+        covarianceEstimate = prediction.Item2;
+        if (landmarkDetector.triangulationAnchors.Count >= 3)
         {
-            stateEstimate = prediction.Item1;
-            covarianceEstimate = prediction.Item2;
-        }
-        else
-        {
-            Vector3 z = landmarkDetector.Observation;   
+            Vector3 z = landmarkDetector.Observation;
+            z = new float3(z.y, z.x, z.z);
+            z.z = Mathf.Deg2Rad * z.z;
             var correctedPrediction = kalmanPrediction.CorrectionStep(stateEstimate, covarianceEstimate, (float3)z);
             stateEstimate = correctedPrediction.Item1;
             covarianceEstimate = correctedPrediction.Item2;
         }
+
         trajectoryPoints.Add(new Vector3(stateEstimate.y, 0, stateEstimate.x));
     }
 
@@ -83,7 +78,7 @@ public class Localizer : MonoBehaviour
         }
     }
 
-    private void DrawPredictedTrajectory() // 🔥
+    private void DrawPredictedTrajectory()
     {
 #if UNITY_EDITOR
         if (trajectoryPoints.Count < 2) return;

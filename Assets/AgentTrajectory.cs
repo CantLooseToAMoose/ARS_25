@@ -5,12 +5,13 @@ using UnityEditor;
 [ExecuteAlways] // Allows drawing in Edit mode too
 public class AgentTrajectory : MonoBehaviour
 {
-    [Header("Trajectory Settings")]
-    public float minDistance = 0.1f; // Minimum distance between recorded points
-    public float dotSpacing = 4f;    // Spacing between dots in pixels
+    [Header("Trajectory Settings")] public float minDistance = 0.1f; // Minimum distance between recorded points
+    public float dotSpacing = 4f; // Spacing between dots in pixels
 
     private List<Vector3> trajectoryPoints = new List<Vector3>();
     private Vector3 lastPosition;
+
+    public bool debug;
 
     private void Start()
     {
@@ -30,6 +31,10 @@ public class AgentTrajectory : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!debug)
+        {
+            return;
+        }
 #if UNITY_EDITOR
         if (trajectoryPoints.Count < 2) return;
 

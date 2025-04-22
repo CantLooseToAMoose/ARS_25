@@ -42,7 +42,7 @@ public class KalmanPrediction
         );
 
         stateEstimate = float3.zero;
-        covarianceEstimate = float3x3.identity;
+        covarianceEstimate = 10*float3x3.identity;
     }
 
     private float3x2 ComputeB(float theta)

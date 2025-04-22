@@ -83,7 +83,7 @@ public class LandmarkDetector : MonoBehaviour
                     float r = Mathf.Sqrt(dx * dx + dz * dz);
                     float phi = Mathf.Atan2(dz, dx) - agentTheta;
 
-                    // Normalize φ to [-π, π]
+                    // Normalize 
                     phi = Mathf.Repeat(phi + Mathf.PI, 2 * Mathf.PI) - Mathf.PI;
 
                     measurements.Add(new LandmarkMeasurement(r, phi, landmark.signature));

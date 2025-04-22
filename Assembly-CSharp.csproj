@@ -41,15 +41,16 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\AgentTrajectory.cs" />
     <Compile Include="Assets\Scripts\PlayerInputController.cs" />
+    <Compile Include="Assets\Scripts\KalManPrediction.cs" />
+    <Compile Include="Assets\Scripts\Landmark.cs" />
+    <Compile Include="Assets\Scripts\LandmarkDetector.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\LidarSensors.cs" />
     <Compile Include="Assets\Scripts\SimpleMovement.cs" />
-    <Compile Include="Assets\Scripts\LandmarkDetector.cs" />
-    <Compile Include="Assets\Scripts\Landmark.cs" />
-    <Compile Include="Assets\Scripts\KalManPrediction.cs" />
+    <Compile Include="Assets\Scripts\Triangulation.cs" />
     <Compile Include="Assets\Scripts\Localizer.cs" />
-    <Compile Include="Assets\AgentTrajectory.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.45f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
