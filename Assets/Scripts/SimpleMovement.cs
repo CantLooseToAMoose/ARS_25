@@ -12,6 +12,10 @@ public class SimpleMovement : MonoBehaviour
     private float moveInput = 0f;
     private float rotationInput = 0f;
 
+    [Header("Noise Settings")]
+    public float movementNoise = 0.1f;
+    public float rotationNoise = 0.1f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,15 +54,22 @@ public class SimpleMovement : MonoBehaviour
 
     private void ApplyMovement()
     {
-        Vector3 forwardVelocity = transform.forward * (moveInput * speed);
-        rb.velocity = new Vector3(forwardVelocity.x, rb.velocity.y, forwardVelocity.z);
+        if (Mathf.Abs(rotationInput) > 0f || Mathf.Abs(rotationNoise) > 0f)
+        {
+            float noise = Mathf.Abs(GaussianSampler.SampleGaussian(1, movementNoise));
+
+            Vector3 forwardVelocity = transform.forward * (moveInput * noise * speed);
+            rb.velocity = new Vector3(forwardVelocity.x, rb.velocity.y, forwardVelocity.z);
+        }
     }
 
     private void ApplyRotation()
     {
-        if (Mathf.Abs(rotationInput) > 0f)
+        if (Mathf.Abs(rotationInput) > 0f || Mathf.Abs(rotationNoise) > 0f)
         {
-            float rotation = rotationInput * rotationSpeed * Time.fixedDeltaTime;
+            float noise = GaussianSampler.SampleGaussian(0, rotationNoise);
+
+            float rotation = rotationInput * rotationSpeed * Time.fixedDeltaTime + noise * Time.fixedDeltaTime;
             Quaternion deltaRotation = Quaternion.Euler(0f, rotation, 0f);
             rb.MoveRotation(rb.rotation * deltaRotation);
         }

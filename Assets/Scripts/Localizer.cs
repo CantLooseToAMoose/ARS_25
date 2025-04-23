@@ -8,6 +8,13 @@ using UnityEditor; // Required for Handles
 
 public class Localizer : MonoBehaviour
 {
+    public float Rx = 0.1f;
+    public float Ry = 0.1f;
+    public float Rtheta = 0.1f;
+    public float Qx = 0.1f;
+    public float Qy = 0.1f;
+    public float Qtheta = 0.1f;
+
     public SimpleMovement movement;
     public KalmanPrediction kalmanPrediction;
     public LandmarkDetector landmarkDetector;
@@ -20,7 +27,7 @@ public class Localizer : MonoBehaviour
 
     private void Start()
     {
-        kalmanPrediction = new KalmanPrediction(0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f);
+        kalmanPrediction = new KalmanPrediction(Rx, Ry, Rtheta, Qx, Qy, Qtheta);
         landmarkDetector = GetComponent<LandmarkDetector>();
     }
 
@@ -28,6 +35,14 @@ public class Localizer : MonoBehaviour
     {
         kalmanPrediction.deltaTime = Time.deltaTime;
         var control = new float2(movement.GetForwardVelocity(), movement.GetRotationalVelocity());
+
+        Debug.Log($"Control: {control.x}, {control.y}");
+
+        if (control.x == 0 && control.y == 0)
+        {
+            return;
+        }
+
         control.y = Mathf.Deg2Rad * control.y;
         var prediction = kalmanPrediction.PredictionStep(stateEstimate, covarianceEstimate, control);
         stateEstimate = prediction.Item1;
@@ -51,6 +66,7 @@ public class Localizer : MonoBehaviour
 
         DrawEstimateLabel();
         DrawPredictedTrajectory();
+        DrawCovarianceEllipse();
     }
 
     private void DrawEstimateLabel()
@@ -77,6 +93,55 @@ public class Localizer : MonoBehaviour
             UnityEditor.Handles.EndGUI();
         }
     }
+
+private void DrawCovarianceEllipse()
+{
+#if UNITY_EDITOR
+    if (!Application.isPlaying) return;
+
+    // Extract 2x2 covariance for x and y
+    float2 mean = new float2(stateEstimate.x, stateEstimate.y);
+    float2x2 cov2D = new float2x2(
+        covarianceEstimate.c0.x, covarianceEstimate.c0.y,
+        covarianceEstimate.c1.x, covarianceEstimate.c1.y
+    );
+
+    // Eigen decomposition
+    float trace = cov2D.c0.x + cov2D.c1.y;
+    float det = cov2D.c0.x * cov2D.c1.y - cov2D.c0.y * cov2D.c1.x;
+    float temp = math.sqrt(math.pow(trace / 2, 2) - det);
+    float lambda1 = trace / 2 + temp;
+    float lambda2 = trace / 2 - temp;
+
+    // Eigenvectors
+    float2 direction;
+    if (math.abs(cov2D.c0.y) > 0.001f)
+    {
+        direction = math.normalize(new float2(lambda1 - cov2D.c1.y, cov2D.c0.y));
+    }
+    else
+    {
+        direction = new float2(1, 0);
+    }
+
+    // Angle and axes
+    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    float a = 2 * math.sqrt(lambda1); // major axis (scaled for visibility)
+    float b = 2 * math.sqrt(lambda2); // minor axis
+
+    // Draw ellipse
+    Handles.color = Color.green;
+    Matrix4x4 matrix = Matrix4x4.TRS(
+        new Vector3(mean.y, 0, mean.x), // notice switch x<->y to match your transform mapping
+        Quaternion.Euler(0, -angle, 0),
+        new Vector3(b, 1, a)
+    );
+    using (new Handles.DrawingScope(matrix))
+    {
+        Handles.DrawWireDisc(Vector3.zero, Vector3.up, 1);
+    }
+#endif
+}
 
     private void DrawPredictedTrajectory()
     {

@@ -54,15 +54,6 @@ public class KalmanPrediction
         );
     }
 
-    public void KalmanFilter(float2 control, float3 observation)
-    {
-        var (predState, predCov) = PredictionStep(stateEstimate, covarianceEstimate, control);
-        var (corrState, corrCov) = CorrectionStep(predState, predCov, observation);
-
-        stateEstimate = corrState;
-        covarianceEstimate = corrCov;
-    }
-
     public (float3, float3x3) PredictionStep(float3 prevState, float3x3 prevCov, float2 control)
     {
         float theta = prevState.z;
