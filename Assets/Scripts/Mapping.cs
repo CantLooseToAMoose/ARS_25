@@ -6,7 +6,7 @@ public class Mapping
     public float[,] map; // 2D grid array to represent the map
 
     // Occupancy grid parameters
-    public float priorLogOdds = 0.0f; // Prior log odds for each grid cell
+    public float priorLogOdds = 0.0f; // Prior log odds for each grid cell being occupied : log (p_occupied / p_free)
     public float freeGridOdds = -0.5f; // Log odds for free grid cells
     public float occupiedGridOdds = 0.5f; // Log odds for occupied grid cells
 
