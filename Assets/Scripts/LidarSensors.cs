@@ -20,7 +20,9 @@ public class LidarSensors : MonoBehaviour
     public Vector3 offset;
 
     [Tooltip("Distance from center to begin raycasting (to simulate radius)")]
-    public float radiusOffset = 0.1f;
+    public float radiusOffset = 0f;
+    
+    public RaycastResult[] LastScan { get; private set; }
 
     #region Debug Settings
 
@@ -36,18 +38,19 @@ public class LidarSensors : MonoBehaviour
 
     #endregion
 
-    struct RaycastResult
+    public struct RaycastResult
     {
         public Vector3 direction;
+        public bool hit;
         public float distance;
         public Vector3 hitPoint;
-        public bool hit;
     }
 
     private void Update()
     {
         Vector3 origin = transform.position;
         RaycastResult[] rayResults = PerformRaycasts(origin);
+        LastScan = rayResults;
     }
 
     void OnDrawGizmosSelected()
@@ -128,4 +131,5 @@ public class LidarSensors : MonoBehaviour
 
         return directions;
     }
+    
 }
