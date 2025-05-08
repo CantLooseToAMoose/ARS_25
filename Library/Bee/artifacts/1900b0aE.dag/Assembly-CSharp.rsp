@@ -114,8 +114,6 @@
 -define:TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
--r:"C:/Master's Artificial Intelligence/Autonomous Robotic Systems/Unity Project/ARS_25/Library/PackageCache/com.unity.testtools.codecoverage@1.2.6/lib/ReportGenerator/ReportGeneratorMerged.dll"
--r:"C:/Master's Artificial Intelligence/Autonomous Robotic Systems/Unity Project/ARS_25/Library/PackageCache/com.unity.visualscripting@1.8.0/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/Managed/UnityEngine/UnityEditor.DeviceSimulatorModule.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/Managed/UnityEngine/UnityEditor.DiagnosticsModule.dll"
@@ -320,6 +318,8 @@
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/NetStandard/compat/2.1.0/shims/netstandard/System.Xml.XPath.XDocument.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/NetStandard/Extensions/2.0.0/System.Runtime.InteropServices.WindowsRuntime.dll"
 -r:"C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/NetStandard/ref/2.1.0/netstandard.dll"
+-r:"E:/Unity Games/ARS 25/Library/PackageCache/com.unity.testtools.codecoverage@1.2.6/lib/ReportGenerator/ReportGeneratorMerged.dll"
+-r:"E:/Unity Games/ARS 25/Library/PackageCache/com.unity.visualscripting@1.8.0/Runtime/VisualScripting.Flow/Dependencies/NCalc/Unity.VisualScripting.Antlr3.Runtime.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.EditorCoroutines.Editor.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.Mathematics.Editor.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/Unity.Mathematics.ref.dll"
@@ -353,6 +353,9 @@
 "Assets/Scripts/LandmarkDetector.cs"
 "Assets/Scripts/LidarSensors.cs"
 "Assets/Scripts/Localizer.cs"
+"Assets/Scripts/MapBehaviour.cs"
+"Assets/Scripts/Mapping.cs"
+"Assets/Scripts/MapVisualizer.cs"
 "Assets/Scripts/PlayerInputController.cs"
 "Assets/Scripts/SimpleMovement.cs"
 "Assets/Scripts/Triangulation.cs"

@@ -13,24 +13,29 @@ public class Mapping
     public float priorLogOdds = 0.0f; // Prior log odds for each grid cell being occupied : log (p_occupied / p_free)
     public float freeGridOdds = -0.5f; // Log odds for free grid cells
     public float occupiedGridOdds = 0.5f; // Log odds for occupied grid cells
-    public float resolution; // Meaning the amount of continuous space needed for one grid (currently the same for width and height)
-    public float width, height; // 
-    
+
+    public float
+        resolution; // Meaning the amount of continuous space needed for one grid (currently the same for width and height)
+
+    public int width, height; // 
+
     /// <summary>please change if we change the size and coordinates of our map
     /// currently these are the coordinates of the corners of our map idk how to get these cleaner unity noob.</summary>
     public float minWidth = -25;
+
     public float maxWidth = 25;
     public float minHeight = -25;
     public float maxHeight = 25;
-    
-    
-    public Mapping(float worldWidth, float worldHeight, float resolution) // expects total length and width in continuous lentghs
+
+
+    public Mapping(float worldWidth, float worldHeight,
+        float resolution) // expects total length and width in continuous lentghs
     {
         this.resolution = resolution;
-        this.width  = Mathf.CeilToInt(worldWidth  / resolution);
+        this.width = Mathf.CeilToInt(worldWidth / resolution);
         this.height = Mathf.CeilToInt(worldHeight / resolution);
-        
-        map = new float[width+1, height+1];
+
+        map = new float[width + 1, height + 1];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -55,17 +60,23 @@ public class Mapping
     }
 
     // This function uses the lidar sensors to match the beams to grids
-    public Grid[] RetrieveGrids(LidarSensors sensor, float stepSize) 
+    public Grid[] RetrieveGrids(LidarSensors sensor, Vector3 pose, float stepSize)
     {
-        RaycastResult[] scan   = sensor.LastScan;             // contains Vector3 direction; float distance; Vector3 hitPoint; bool hit;
-        Vector3 origin = sensor.transform.position;   // Vector3 .x ==x, .y == height, .z == y
+        LidarSensors.RaycastResult[]
+            scan = sensor.LastScan; // contains Vector3 direction; float distance; Vector3 hitPoint; bool hit;
+        Vector3 origin = sensor.transform.position; // Vector3 .x ==x, .y == height, .z == y
 
         var grids = new List<Grid>();
+        if (scan == null)
+        {
+            return grids.ToArray();
+        }
+
         foreach (var beam in scan)
         {
             // Make the first cell occupied cell if we hit something
-            float maxDist = beam.hit 
-                ? beam.distance 
+            float maxDist = beam.hit
+                ? beam.distance
                 : sensor.maxLength;
 
             if (beam.hit)
@@ -75,7 +86,7 @@ public class Mapping
             }
 
             // 2) Walk from the origin of the sensor with some stepsize to the end
-            int steps = Mathf.CeilToInt(maxDist/ stepSize);
+            int steps = Mathf.CeilToInt(maxDist / stepSize);
             for (int i = 1; i < steps; i++)
             {
                 float d = i * stepSize;
@@ -86,7 +97,6 @@ public class Mapping
                 {
                     grids.Add(cell);
                 }
-                
             }
         }
 
@@ -94,9 +104,11 @@ public class Mapping
     }
 
     // This function updates the map with the new beams - Occupancy grid mapping
-    public void UpdateMap(LidarSensors sensor, float stepSize)
+    public void UpdateMap(LidarSensors sensor, Localizer localizer, float stepSize)
     {
-        Grid[] grids = RetrieveGrids(sensor, stepSize);
+        Vector3 poseState = localizer.stateEstimate;
+        Vector3 pose = new Vector3(poseState.y, 1, poseState.x);
+        Grid[] grids = RetrieveGrids(sensor, pose, stepSize);
 
         foreach (var grid in grids)
         {
@@ -120,7 +132,7 @@ public class Mapping
     }
 
     // Function to convert log odds to probability of occupancy
-    public float obtainProbabilityOccupied(int x, int y)
+    public float ObtainProbabilityOccupied(int x, int y)
     {
         // Convert log odds to probability
         float logOdds = map[x, y];
@@ -129,12 +141,12 @@ public class Mapping
 
     public Vector2Int WorldToGrid(float x, float y)
     {
-        int xGrid = Mathf.FloorToInt((x - minWidth)  / resolution);
+        int xGrid = Mathf.FloorToInt((x - minWidth) / resolution);
         int yGrid = Mathf.FloorToInt((y - minHeight) / resolution);
         return new Vector2Int(xGrid, yGrid);
     }
 
-    public Vector2 WridToWorld(int x, int y)
+    public Vector2 GridToWorld(int x, int y)
     {
         float xWorld = (x * resolution) - maxWidth;
         float yWorld = (y * resolution) - maxHeight;

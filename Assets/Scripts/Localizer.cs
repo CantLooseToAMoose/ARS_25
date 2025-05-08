@@ -36,7 +36,7 @@ public class Localizer : MonoBehaviour
         kalmanPrediction.deltaTime = Time.deltaTime;
         var control = new float2(movement.GetForwardVelocity(), movement.GetRotationalVelocity());
 
-        Debug.Log($"Control: {control.x}, {control.y}");
+        // Debug.Log($"Control: {control.x}, {control.y}");
 
         if (control.x == 0 && control.y == 0)
         {
