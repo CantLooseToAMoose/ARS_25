@@ -29,6 +29,8 @@ public class Localizer : MonoBehaviour
     {
         kalmanPrediction = new KalmanPrediction(Rx, Ry, Rtheta, Qx, Qy, Qtheta);
         landmarkDetector = GetComponent<LandmarkDetector>();
+        stateEstimate.x = transform.position.z;
+        stateEstimate.y = transform.position.x;
     }
 
     private void Update()
@@ -66,7 +68,7 @@ public class Localizer : MonoBehaviour
 
         DrawEstimateLabel();
         DrawPredictedTrajectory();
-        DrawCovarianceEllipse();
+        // DrawCovarianceEllipse();
     }
 
     private void DrawEstimateLabel()

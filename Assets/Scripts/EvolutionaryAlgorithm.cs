@@ -19,7 +19,7 @@ public class EvolutionaryAlgorithm
     /// <summary>
     /// Initializes a population of random individuals.
     /// </summary>
-    private List<float[]> InitializePopulation()
+    public List<float[]> InitializePopulation()
     {
         var population = new List<float[]>(PopulationSize);
         for (int i = 0; i < PopulationSize; i++)
@@ -27,7 +27,7 @@ public class EvolutionaryAlgorithm
             var individual = new float[GenomeLength];
             for (int j = 0; j < GenomeLength; j++)
             {
-                individual[j] = UnityEngine.Random.Range(0f, 1f);
+                individual[j] = UnityEngine.Random.Range(-1f, 1f);
             }
             population.Add(individual);
         }
@@ -47,34 +47,31 @@ public class EvolutionaryAlgorithm
     /// <summary>
     /// Selects parents by truncated rank-based selection.
     /// </summary>
-    private List<float[]> SelectParents(List<float[]> population, List<float> fitnesses, int numParents)
+    public List<float[]> SelectParents(List<float[]> population, List<float> fitnesses, int numParents)
     {
-        // Pair and sort by descending fitness
         var paired = new List<(float fitness, float[] genome)>(PopulationSize);
         for (int i = 0; i < PopulationSize; i++)
             paired.Add((fitnesses[i], population[i]));
         paired.Sort((a, b) => b.fitness.CompareTo(a.fitness));
-        
-        // How many copies of each top parent to make
-        int copiesPerParent = PopulationSize / numParents;
+
         var parents = new List<float[]>(PopulationSize);
 
-        for (int i = 0; i < numParents; i++)
+        // Fill exactly PopulationSize
+        for (int i = 0; i < PopulationSize; i++)
         {
-            for (int c = 0; c < copiesPerParent; c++)
-            {
-                // Make a copy of their genome
-                var genomeCopy = (float[])paired[i].genome.Clone();
-                parents.Add(genomeCopy);
-            }
+            // Loop through top-ranked parents in round-robin
+            int parentIndex = i % numParents;
+            var genomeCopy = (float[])paired[parentIndex].genome.Clone();
+            parents.Add(genomeCopy);
         }
         return parents;
     }
 
+
     /// <summary>
     /// Applies crossover and mutation to produce the next generation.
     /// </summary>
-    private List<float[]> CrossoverAndMutate(List<float[]> population)
+    public List<float[]> CrossoverAndMutate(List<float[]> population)
     {
         var nextGen = new List<float[]>(PopulationSize);
 

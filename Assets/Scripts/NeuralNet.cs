@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 
 public class NeuralNet{
@@ -35,7 +36,7 @@ public class NeuralNet{
             {
                 sum += weights[idx] * inputs[i];
             }
-            hidden[j] = Sigmoid(sum + weights[biasIdx]);
+            hidden[j] = MathF.Tanh(sum + weights[biasIdx]);
             biasIdx++;
         }
 

@@ -50,7 +50,7 @@ public class MapVisualizer : MonoBehaviour
                 Color color = Color.Lerp(Color.white, Color.black, prob);
 
                 // Flip Y to match Unity's texture coordinate system
-                mapTexture.SetPixel(x, mapping.height - y, color);
+                mapTexture.SetPixel(x, y, color);
             }
         }
 

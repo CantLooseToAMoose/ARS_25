@@ -122,11 +122,13 @@ m_ResolvedPackages:
     - 2.6.0
     - 2.7.1
     - 2.8.1
+    - 2.8.2
     compatible:
     - 2.5.2
     - 2.6.0
     - 2.7.1
     - 2.8.1
+    - 2.8.2
     verified: 2.5.2
   dependencies: []
   resolvedDependencies: []
