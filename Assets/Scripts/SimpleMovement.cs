@@ -12,8 +12,7 @@ public class SimpleMovement : MonoBehaviour
     private float moveInput = 0f;
     private float rotationInput = 0f;
 
-    [Header("Noise Settings")]
-    public float movementNoise = 0.1f;
+    [Header("Noise Settings")] public float movementNoise = 0.1f;
     public float rotationNoise = 0.1f;
 
     void Start()
@@ -54,13 +53,11 @@ public class SimpleMovement : MonoBehaviour
 
     private void ApplyMovement()
     {
-        if (Mathf.Abs(rotationInput) > 0f || Mathf.Abs(rotationNoise) > 0f)
-        {
-            float noise = Mathf.Abs(GaussianSampler.SampleGaussian(1, movementNoise));
+        float noise = 1f + GaussianSampler.SampleGaussian(0f, movementNoise);
 
-            Vector3 forwardVelocity = transform.forward * (moveInput * noise * speed);
-            rb.velocity = new Vector3(forwardVelocity.x, rb.velocity.y, forwardVelocity.z);
-        }
+
+        Vector3 forwardVelocity = transform.forward * (moveInput * noise * speed);
+        rb.velocity = new Vector3(forwardVelocity.x, rb.velocity.y, forwardVelocity.z);
     }
 
     private void ApplyRotation()

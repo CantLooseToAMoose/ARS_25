@@ -20,8 +20,7 @@ public class NeuralNetController : MonoBehaviour
 
     [Header("Map Size")] public Vector2 mapSize = new Vector2(50, 50);
 
-    [Header("Existing Weights")]
-    public bool useExistingWeights = false;
+    [Header("Existing Weights")] public bool useExistingWeights = false;
     public string pathToExistingWeightsFile = "best_weights.csv";
 
     [Header("Debug")] public bool debug;
@@ -33,6 +32,7 @@ public class NeuralNetController : MonoBehaviour
             Debug.LogError("Incorrect weight vector size");
             return;
         }
+
         nnWeight = weights;
     }
 
@@ -52,12 +52,6 @@ public class NeuralNetController : MonoBehaviour
                 Debug.LogWarning("⚠ Failed to load weights from file. Falling back to random weights.");
             }
         }
-
-        // Fallback to random initialization
-        // for (int j = 0; j < nnWeight.Length; j++)
-        // {
-        //     nnWeight[j] = UnityEngine.Random.Range(0f, 1f);
-        // }
     }
 
     private float[] LoadWeightsFromCSV(string filename)
@@ -81,7 +75,7 @@ public class NeuralNetController : MonoBehaviour
                     if (isHeader)
                     {
                         isHeader = false;
-                        continue; // skip header
+                        continue;
                     }
 
                     string[] parts = line.Split(',');
@@ -152,12 +146,22 @@ public class NeuralNetController : MonoBehaviour
         {
             input[i + 2] = lidarDistances[i] / LidarSensors.maxLength;
         }
+
         input[14] = goalHeading[0];
         input[15] = goalHeading[1];
-        
 
         previousControl = NeuralNet.FeedForward(input, nnWeight);
+        Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
         movement.Move(previousControl[0]);
         movement.Rotate(previousControl[1]);
+    }
+
+    // 🔴 This method disables the NN controller after goal is reached
+    public void StopControl()
+    {
+        enabled = false;
+        movement.Move(0f);
+        movement.Rotate(0f);
+        Debug.Log("🛑 NeuralNetController stopped");
     }
 }

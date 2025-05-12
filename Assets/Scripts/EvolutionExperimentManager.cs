@@ -150,7 +150,7 @@ public class EvolutionExperimentManager : MonoBehaviour
 
         if (result.GoalReached)
         {
-            fitness += 2f;
+            fitness += 15f;
         }
         else
         {
@@ -160,11 +160,12 @@ public class EvolutionExperimentManager : MonoBehaviour
         }
 
         // Reward faster solutions
-        // fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
+        fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
 
         // Penalize collisions
         fitness -= 0.1f * result.Collisions;
 
+        Debug.Log(fitness);
         return Mathf.Max(0f, fitness);
     }
 }

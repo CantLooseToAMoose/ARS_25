@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movement: {fileID: 4395669740212311317}
+  timeScale: 1
 --- !u!114 &4395669740212311317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,7 +251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   rotationSpeed: 200
-  movementNoise: 1
+  movementNoise: 0
   rotationNoise: 0.02
 --- !u!114 &4395669740212311318
 MonoBehaviour:
@@ -270,7 +271,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   obstructionLayer:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 823
   showDebug: 0
 --- !u!114 &4395669740212311326
 MonoBehaviour:
@@ -341,7 +342,7 @@ MonoBehaviour:
   maxLength: 12
   sensorMask:
     serializedVersion: 2
-    m_Bits: 183
+    m_Bits: 567
   offset: {x: 0, y: 0, z: 0}
   radiusOffset: 0.1
   hitSphereSize: 0.1
@@ -378,7 +379,7 @@ MonoBehaviour:
   goalTransform: {fileID: 0}
   goalThreshold: 1
   ExperimentController: {fileID: 0}
-  obstacleCheckRadius: 1.05
+  obstacleCheckRadius: 1.1
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 512

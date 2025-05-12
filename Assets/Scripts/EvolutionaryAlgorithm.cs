@@ -10,7 +10,7 @@ public class EvolutionaryAlgorithm
     public float MutationRate { get; set; } = 0.01f;
     public float CrossoverRate { get; set; } = 0.7f;
     public float FitnessThreshold { get; set; } = 0.95f;
-    
+
     // Individual genome length
     public int GenomeLength { get; set; } = 10;
 
@@ -29,8 +29,10 @@ public class EvolutionaryAlgorithm
             {
                 individual[j] = UnityEngine.Random.Range(-1f, 1f);
             }
+
             population.Add(individual);
         }
+
         return population;
     }
 
@@ -64,6 +66,7 @@ public class EvolutionaryAlgorithm
             var genomeCopy = (float[])paired[parentIndex].genome.Clone();
             parents.Add(genomeCopy);
         }
+
         return parents;
     }
 
@@ -99,7 +102,7 @@ public class EvolutionaryAlgorithm
                 {
                     child[gene] += UnityEngine.Random.Range(-0.1f, 0.1f);
                     // Optional: clamp to [0,1]
-                    child[gene] = Mathf.Clamp01(child[gene]);
+                    child[gene] = Mathf.Clamp(child[gene], -1f, 1f);
                 }
             }
 

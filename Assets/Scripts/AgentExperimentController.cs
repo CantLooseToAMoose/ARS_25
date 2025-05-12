@@ -18,7 +18,7 @@ public class AgentExperimentController : MonoBehaviour
     private float elapsedTime = 0f;
     private int collisionCount = 0;
 
-    private bool goalReached = false;
+    public bool goalReached { get; private set; } = false;
 
     public float obstacleCheckRadius = 1f;
     public LayerMask obstacleLayer;
@@ -50,11 +50,11 @@ public class AgentExperimentController : MonoBehaviour
             goalReached = true;
             movement.Move(0f);
             movement.Rotate(0f);
+            nnController?.StopControl();
             Debug.Log($"[Agent {AgentId}] Timeout after {maxTime:F2} seconds");
             LogResults();
         }
     }
-
 
     void Update()
     {
@@ -79,15 +79,13 @@ public class AgentExperimentController : MonoBehaviour
             }
         }
 
-        // Check if goal is reached (still handled here)
+        // Check if goal is reached
         if (Vector3.Distance(transform.position, goalTransform.position) < goalThreshold)
         {
             goalReached = true;
-
-            // Stop movement
             movement.Move(0f);
             movement.Rotate(0f);
-
+            nnController?.StopControl();
             LogResults();
         }
     }
@@ -103,13 +101,11 @@ public class AgentExperimentController : MonoBehaviour
             TimeElapsed = elapsedTime,
             TotalDistance = totalDistance,
             Collisions = collisionCount,
-            FinalDistanceToGoal = finalDistance // 👈 Store the distance here
+            FinalDistanceToGoal = finalDistance 
         };
 
         ExperimentController.SubmitResult(result);
     }
-
-    
 
     void OnDrawGizmosSelected()
     {
@@ -117,4 +113,3 @@ public class AgentExperimentController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, obstacleCheckRadius);
     }
 }
-
