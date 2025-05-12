@@ -61,6 +61,93 @@ public class EvolutionExperimentManager : MonoBehaviour
         experimentController.RunExperiment(batchWeights);
     }
 
+    public bool IsDominated(Dictionary<int, AgentExperimentResult> results, int agentIdx)
+    {
+        var totalDistance = results[agentIdx].TotalDistance;
+        var timeElapsed = results[agentIdx].TimeElapsed;
+        var collisionCount = results[agentIdx].Collisions;
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (i == agentIdx) continue;
+
+            var otherTotalDistance = results[i].TotalDistance;
+            var otherTimeElapsed = results[i].TimeElapsed;
+            var otherCollisionCount = results[i].Collisions;
+
+            // Check if the other agent is better in all objectives
+            if (otherTotalDistance > totalDistance && otherTimeElapsed < timeElapsed && otherCollisionCount <= collisionCount)
+            {
+                return true; // Dominated
+            }
+        }
+        return false; // Not dominated
+    }
+
+    public void OnGenerationCompleteMultiObj(Dictionary<int, AgentExperimentResult> results)
+    {
+        // Multi-objective optimization
+
+        var nonDominated = new List<float[]>();
+
+        // Identify non-dominated individuals
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (!IsDominated(results, i))
+            {
+                nonDominated.Add(population[i]);
+            }
+        }
+
+        var newPopulation = new List<float[]>(populationSize);
+
+        // Fill with non-dominated individuals
+        for (int i = 0; i < populationSize; i++)
+        {
+            if (i < nonDominated.Count)
+            {
+                newPopulation.Add(nonDominated[i]);
+            }
+            else
+            {
+                // Crossover: create a new child
+                int parent1Index = UnityEngine.Random.Range(0, nonDominated.Count);
+                int parent2Index = UnityEngine.Random.Range(0, nonDominated.Count);
+                float[] parent1 = nonDominated[parent1Index];
+                float[] parent2 = nonDominated[parent2Index];
+                float[] child = new float[genomeLength];
+
+                for (int gene = 0; gene < genomeLength; gene++)
+                {
+                    child[gene] = UnityEngine.Random.value < 0.5f ? parent1[gene] : parent2[gene];
+                }
+
+                // Mutation
+                for (int gene = 0; gene < genomeLength; gene++)
+                {
+                    if (UnityEngine.Random.value < mutationRate)
+                    {
+                        child[gene] += UnityEngine.Random.Range(-1f, 1f);
+                    }
+                }
+
+                newPopulation.Add(child); // Add the child to the new population
+            }
+        }
+
+        population = newPopulation;
+        currentGeneration++;
+
+        if (currentGeneration < maxGenerations)
+        {
+            StartGeneration();
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            Debug.Log("🎉 Evolution complete");
+        }
+    }
 
     public void OnGenerationComplete(Dictionary<int, AgentExperimentResult> results)
     {
