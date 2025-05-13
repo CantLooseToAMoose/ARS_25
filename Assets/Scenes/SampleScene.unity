@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &25475943
 Transform:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &54498657
 Transform:
   m_ObjectHideFlags: 0
@@ -462,7 +462,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &61739527
 Transform:
   m_ObjectHideFlags: 0
@@ -933,7 +933,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &215324591
 Transform:
   m_ObjectHideFlags: 0
@@ -1245,7 +1245,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &473532028
 Transform:
   m_ObjectHideFlags: 0
@@ -1486,13 +1486,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   experimentController: {fileID: 809107011}
-  populationSize: 5
+  populationSize: 30
   genomeLength: 78
   mutationRate: 0.01
-  crossOverRate: 0.5
+  crossOverRate: 0.7
   fitnessThreshold: 0.95
-  maxGenerations: 1000
-  timeScale: 1
+  maxGenerations: 150
+  numParents: 10
+  timeScale: 3
 --- !u!1 &556157645
 GameObject:
   m_ObjectHideFlags: 0
@@ -1512,7 +1513,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &556157646
 Transform:
   m_ObjectHideFlags: 0
@@ -1624,7 +1625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &560892325
 Transform:
   m_ObjectHideFlags: 0
@@ -1736,7 +1737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &595003983
 Transform:
   m_ObjectHideFlags: 0
@@ -2374,7 +2375,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &808849363
 Transform:
   m_ObjectHideFlags: 0
@@ -2500,7 +2501,7 @@ MonoBehaviour:
   goalPrefab: {fileID: 2591191378388273533, guid: 08b445acda988c142ba75811df232ea4, type: 3}
   numberOfAgents: 2
   spawnRadius: 25
-  maxExperimentTime: 20
+  maxExperimentTime: 15
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 512
@@ -3093,7 +3094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1169938585
 Transform:
   m_ObjectHideFlags: 0
@@ -3598,7 +3599,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1448645313
 Transform:
   m_ObjectHideFlags: 0
@@ -3778,7 +3779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1585814653
 Transform:
   m_ObjectHideFlags: 0
@@ -3890,7 +3891,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1626101739
 Transform:
   m_ObjectHideFlags: 0
@@ -4226,7 +4227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1711973891
 Transform:
   m_ObjectHideFlags: 0

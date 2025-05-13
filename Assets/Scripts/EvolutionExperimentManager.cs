@@ -11,6 +11,7 @@ public class EvolutionExperimentManager : MonoBehaviour
     public float crossOverRate = 0.7f;
     public float fitnessThreshold = 0.95f;
     public int maxGenerations = 15;
+    public int numParents = 5;
 
     public float timeScale = 5f;
 
@@ -76,11 +77,13 @@ public class EvolutionExperimentManager : MonoBehaviour
             var otherCollisionCount = results[i].Collisions;
 
             // Check if the other agent is better in all objectives
-            if (otherTotalDistance > totalDistance && otherTimeElapsed < timeElapsed && otherCollisionCount <= collisionCount)
+            if (otherTotalDistance > totalDistance && otherTimeElapsed < timeElapsed &&
+                otherCollisionCount <= collisionCount)
             {
                 return true; // Dominated
             }
         }
+
         return false; // Not dominated
     }
 
@@ -168,7 +171,6 @@ public class EvolutionExperimentManager : MonoBehaviour
             }
         }
 
-        int numParents = Mathf.Max(2, populationSize / 2);
         var parents = ea.SelectParents(population, fitnesses, numParents);
         population = ea.CrossoverAndMutate(parents);
 
@@ -245,7 +247,7 @@ public class EvolutionExperimentManager : MonoBehaviour
             float normalizedDistance = Mathf.Clamp01(result.FinalDistanceToGoal / experimentController.spawnRadius);
             fitness -= normalizedDistance; // penalize large distances
         }
-
+        
         // Reward faster solutions
         fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
 

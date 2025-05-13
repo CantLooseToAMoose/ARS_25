@@ -27,7 +27,7 @@ public class SimpleMovement : MonoBehaviour
     {
         ApplyMovement();
         ApplyRotation();
-        Debug.Log("Velocity: " + rb.velocity);
+        // Debug.Log("Velocity: " + rb.velocity);
     }
 
     public float GetForwardVelocity()

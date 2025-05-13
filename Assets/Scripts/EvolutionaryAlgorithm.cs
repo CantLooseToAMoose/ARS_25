@@ -145,7 +145,7 @@ public class EvolutionaryAlgorithm
             }
 
             // Select parents
-            int numParents = Mathf.Max(2, PopulationSize / 10);
+            int numParents = Mathf.Max(2, PopulationSize / 5);
             var parents = SelectParents(population, fitnesses, numParents);
 
             // Generate next generation

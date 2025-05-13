@@ -155,7 +155,7 @@ public class NeuralNetController : MonoBehaviour
         input[15] = goalHeading[1];
 
         previousControl = NeuralNet.FeedForward(input, nnWeight);
-        Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
+        // Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
         movement.Move(previousControl[0]);
         movement.Rotate(previousControl[1]);
     }
