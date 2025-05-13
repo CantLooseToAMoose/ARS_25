@@ -6,7 +6,7 @@ public class EvolutionExperimentManager : MonoBehaviour
 {
     public RobotNavigationExperimentController experimentController;
     public int populationSize = 5;
-    public int genomeLength = 78;
+    public int genomeLength = 70;
     public float mutationRate = 0.01f;
     public float crossOverRate = 0.7f;
     public float fitnessThreshold = 0.95f;

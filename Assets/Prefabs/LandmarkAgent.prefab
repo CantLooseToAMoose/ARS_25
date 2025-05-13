@@ -353,7 +353,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4395669740212311319}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d6042a45c9c2c54fb96c6722c3bc520, type: 3}
   m_Name: 
@@ -399,6 +399,9 @@ MonoBehaviour:
   LidarSensors: {fileID: 4395669740212311324}
   Localizer: {fileID: 4395669740212311326}
   ExperimentController: {fileID: 3609735664517245332}
+  MapBehaviour: {fileID: 0}
+  mapDiscretizationFactor_x: 10
+  mapDiscretizationFactor_y: 10
   lidarDistances:
   - 0
   - 0
@@ -497,4 +500,4 @@ MonoBehaviour:
   mapSize: {x: 50, y: 50}
   useExistingWeights: 0
   pathToExistingWeightsFile: best_weights.csv
-  debug: 0
+  debug: 1

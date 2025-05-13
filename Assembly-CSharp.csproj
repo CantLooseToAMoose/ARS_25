@@ -55,11 +55,11 @@
     <Compile Include="Assets\Scripts\GaussianSampler.cs" />
     <Compile Include="Assets\Scripts\EvolutionExperimentManager.cs" />
     <Compile Include="Assets\Scripts\LidarSensors.cs" />
+    <Compile Include="Assets\Scripts\ANeuralNet.cs" />
     <Compile Include="Assets\Scripts\SimpleMovement.cs" />
     <Compile Include="Assets\Scripts\Triangulation.cs" />
     <Compile Include="Assets\Scripts\Localizer.cs" />
     <Compile Include="Assets\Scripts\Mapping.cs" />
-    <Compile Include="Assets\Scripts\ExperimentLauncher.cs" />
     <Compile Include="Assets\Scripts\EvolutionaryAlgorithm.cs" />
     <Compile Include="Assets\Scripts\AgentExperimentController.cs" />
     <Compile Include="Assets\NeuralNetController.cs" />

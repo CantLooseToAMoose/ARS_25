@@ -12,14 +12,16 @@ public class NeuralNetController : MonoBehaviour
     public LidarSensors LidarSensors;
     public Localizer Localizer;
     public AgentExperimentController ExperimentController;
-
+    public MapBehaviour MapBehaviour;
     public int mapDiscretizationFactor_x = 10;
     public int mapDiscretizationFactor_y = 10;
+
 
     [HideInInspector] public float[] lidarDistances = new float[12];
     [HideInInspector] public float[] goalHeading = new float[2];
     [HideInInspector] private float[] previousControl = new float[2];
-    [HideInInspector] public float[] nnWeight = new float[78];
+    [HideInInspector] public float[] nnWeight;
+    private EvolutionExperimentManager _experimentManager;
 
     [Header("Map Size")] public Vector2 mapSize = new Vector2(50, 50);
 
@@ -30,12 +32,6 @@ public class NeuralNetController : MonoBehaviour
 
     public void SetWeights(float[] weights)
     {
-        if (weights.Length != 78)
-        {
-            Debug.LogError("Incorrect weight vector size");
-            return;
-        }
-
         nnWeight = weights;
     }
 
@@ -47,15 +43,41 @@ public class NeuralNetController : MonoBehaviour
             if (loaded != null)
             {
                 SetWeights(loaded);
-                Debug.Log("✅ Loaded weights from file: " + pathToExistingWeightsFile);
-                return;
+                Debug.Log("Loaded weights from file: " + pathToExistingWeightsFile);
             }
             else
             {
-                Debug.LogWarning("⚠ Failed to load weights from file. Falling back to random weights.");
+                Debug.LogWarning("Failed to load weights from file. Falling back to random weights.");
+            }
+        }
+
+        if (MapBehaviour == null)
+        {
+            if (!TryGetComponent<MapBehaviour>(out MapBehaviour mapBehaviour))
+            {
+                Debug.LogWarning("MapBehaviour component not found on this GameObject.");
+            }
+            else
+            {
+                MapBehaviour = mapBehaviour;
+            }
+        }
+
+        // Find the EvolutionExperimentManager in the scene
+        _experimentManager = FindObjectOfType<EvolutionExperimentManager>();
+        if (_experimentManager == null)
+        {
+            Debug.LogWarning("EvolutionExperimentManager not found in the scene.");
+        }
+        else
+        {
+            if (debug)
+            {
+                Debug.Log("EvolutionExperimentManager assigned successfully.");
             }
         }
     }
+
 
     private float[] LoadWeightsFromCSV(string filename)
     {
@@ -95,26 +117,14 @@ public class NeuralNetController : MonoBehaviour
             return null;
         }
 
-        if (weights.Count != 78)
-        {
-            Debug.LogError($"CSV does not contain 78 weights (found {weights.Count})");
-            return null;
-        }
-
         return weights.ToArray();
     }
 
     void FixedUpdate()
     {
-        if (nnWeight.Length != 78)
-        {
-            Debug.LogError("NN has the Wrong Size");
-            return;
-        }
-
         // Get all Lidar distances
         LidarSensors.RaycastResult[] lastScan = LidarSensors.LastScan;
-        if (lastScan!=null)
+        if (lastScan != null)
         {
             for (int i = 0; i < lastScan.Length; i++)
             {
@@ -148,14 +158,17 @@ public class NeuralNetController : MonoBehaviour
 
         // Set the nn input; goalHeading (2), position goal (2), pose estimate (3), lidarDistances (12), discretized map
 
-        bool mapping = false; // TODO ; set mapping
+        // Enable mapping if MapBehaviour is active
+        bool mapping = MapBehaviour != null && MapBehaviour.isActiveAndEnabled;
+
 
         int inputDim = 2 + 12;
         if (mapping)
         {
             inputDim += 3 + mapDiscretizationFactor_x * mapDiscretizationFactor_y;
         }
-        float[] input = new float[2 + 12];
+
+        float[] input = new float[inputDim];
 
         // Set the goal heading
         input[0] = goalHeading[0];
@@ -181,11 +194,11 @@ public class NeuralNetController : MonoBehaviour
             input[18] = estimateAngle / 360;
 
             // Assume Mapping.map is a 2D array of some kind (e.g., int[,], float[,], or a custom struct[,])
-            
 
-            var map = Mapping.map;
-            int width = Mapping.maxWidth - Mapping.minWidth;
-            int height = Mapping.maxHeight - Mapping.minHeight;
+
+            var map = MapBehaviour.Mapping.map;
+            float width = MapBehaviour.Mapping.maxWidth - MapBehaviour.Mapping.minWidth;
+            float height = MapBehaviour.Mapping.maxHeight - MapBehaviour.Mapping.minHeight;
 
             // Output array: coarser grid
             float[,] coarseMap = new float[mapDiscretizationFactor_x, mapDiscretizationFactor_y];
@@ -194,8 +207,8 @@ public class NeuralNetController : MonoBehaviour
             {
                 for (int j = 0; j < mapDiscretizationFactor_y; j++)
                 {
-                    int corner_x = i * (width / mapDiscretizationFactor_x);
-                    int corner_y = j * (height / mapDiscretizationFactor_y);
+                    int corner_x = i * ((int)width / mapDiscretizationFactor_x);
+                    int corner_y = j * ((int)height / mapDiscretizationFactor_y);
 
                     // Calculate the average value in the sub-grid
                     for (int x = corner_x; x < corner_x + (width / mapDiscretizationFactor_x); x++)
@@ -204,7 +217,8 @@ public class NeuralNetController : MonoBehaviour
                         {
                             if (x >= 0 && x < map.GetLength(0) && y >= 0 && y < map.GetLength(1))
                             {
-                                coarseMap[i, j] += Mapping.ObtainProbabilityOccupied(x, y);  // TODO: CHECK THIS
+                                coarseMap[i, j] +=
+                                    MapBehaviour.Mapping.ObtainProbabilityOccupied(x, y); // TODO: CHECK THIS
                             }
                         }
                     }
@@ -218,9 +232,13 @@ public class NeuralNetController : MonoBehaviour
             }
         }
 
-        Debug.Log("Input:" + input);
+        if (debug)
+        {
+            Debug.Log("Input: [" + string.Join(", ", input) + "]");
+        }
 
-        previousControl = NeuralNet.FeedForward(input, nnWeight);
+
+        previousControl = ANeuralNet.FeedForward(input, nnWeight, new[] { inputDim, 4, 2 });
         // Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
         movement.Move(previousControl[0]);
         movement.Rotate(previousControl[1]);

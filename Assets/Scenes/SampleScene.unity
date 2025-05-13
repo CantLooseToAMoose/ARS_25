@@ -1486,14 +1486,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   experimentController: {fileID: 809107011}
-  populationSize: 30
-  genomeLength: 78
+  populationSize: 10
+  genomeLength: 70
   mutationRate: 0.01
   crossOverRate: 0.7
   fitnessThreshold: 0.95
   maxGenerations: 150
   numParents: 10
-  timeScale: 3
+  timeScale: 2
 --- !u!1 &556157645
 GameObject:
   m_ObjectHideFlags: 0
