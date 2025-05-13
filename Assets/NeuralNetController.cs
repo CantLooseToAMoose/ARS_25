@@ -165,7 +165,7 @@ public class NeuralNetController : MonoBehaviour
         int inputDim = 2 + 12;
         if (mapping)
         {
-            inputDim += 3 + mapDiscretizationFactor_x * mapDiscretizationFactor_y;
+            inputDim += 5 + mapDiscretizationFactor_x * mapDiscretizationFactor_y;
         }
 
         float[] input = new float[inputDim];
@@ -194,40 +194,38 @@ public class NeuralNetController : MonoBehaviour
             input[18] = estimateAngle / 360;
 
             // Assume Mapping.map is a 2D array of some kind (e.g., int[,], float[,], or a custom struct[,])
-
-
             var map = MapBehaviour.Mapping.map;
             float width = MapBehaviour.Mapping.maxWidth - MapBehaviour.Mapping.minWidth;
             float height = MapBehaviour.Mapping.maxHeight - MapBehaviour.Mapping.minHeight;
-
-            // Output array: coarser grid
-            float[,] coarseMap = new float[mapDiscretizationFactor_x, mapDiscretizationFactor_y];
 
             for (int i = 0; i < mapDiscretizationFactor_x; i++)
             {
                 for (int j = 0; j < mapDiscretizationFactor_y; j++)
                 {
-                    int corner_x = i * ((int)width / mapDiscretizationFactor_x);
-                    int corner_y = j * ((int)height / mapDiscretizationFactor_y);
+                    int index = i * mapDiscretizationFactor_y + j + 18;
+                    
+                    float sum = 0f;
+                    int count = 0;
 
-                    // Calculate the average value in the sub-grid
-                    for (int x = corner_x; x < corner_x + (width / mapDiscretizationFactor_x); x++)
+                    // Coordinates for the top-left of the sub-grid
+                    var gridSizeX = (int)width / mapDiscretizationFactor_x;
+                    var gridSizeY = (int)height / mapDiscretizationFactor_y;
+
+                    int startX = i * gridSizeX;
+                    int startY = j * gridSizeY;
+
+                    // Sum up values in the sub-grid
+                    for (int x = startX; x < startX + gridSizeX; x++)
                     {
-                        for (int y = corner_y; y < corner_y + (height / mapDiscretizationFactor_y); y++)
+                        for (int y = startY; y < startY + gridSizeY; y++)
                         {
-                            if (x >= 0 && x < map.GetLength(0) && y >= 0 && y < map.GetLength(1))
-                            {
-                                coarseMap[i, j] +=
-                                    MapBehaviour.Mapping.ObtainProbabilityOccupied(x, y); // TODO: CHECK THIS
-                            }
+                            sum += 1.0f - 1.0f / (1.0f + Mathf.Exp(map[x, y]));
+                            count++;
                         }
                     }
 
-                    // Normalize the average value
-                    coarseMap[i, j] /= (width / mapDiscretizationFactor_x) * (height / mapDiscretizationFactor_y);
-
-                    // Set the input value
-                    input[i * mapDiscretizationFactor_y + j + 7 + 12] = coarseMap[i, j];
+                    // Store average log-odds (or use sum if you prefer)
+                    input[index] = sum / count;
                 }
             }
         }
@@ -237,8 +235,7 @@ public class NeuralNetController : MonoBehaviour
             Debug.Log("Input: [" + string.Join(", ", input) + "]");
         }
 
-
-        previousControl = ANeuralNet.FeedForward(input, nnWeight, new[] { inputDim, 4, 2 });
+        previousControl = ANeuralNet.FeedForward(input, nnWeight, new[] { inputDim, 64, 32, 2 });
         // Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
         movement.Move(previousControl[0]);
         movement.Rotate(previousControl[1]);
