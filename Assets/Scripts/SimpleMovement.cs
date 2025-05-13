@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 
@@ -21,10 +22,12 @@ public class SimpleMovement : MonoBehaviour
         Debug.Log("Movement Controller Initialized");
     }
 
-    void FixedUpdate()
+
+    void Update()
     {
         ApplyMovement();
         ApplyRotation();
+        Debug.Log("Velocity: " + rb.velocity);
     }
 
     public float GetForwardVelocity()
@@ -62,14 +65,11 @@ public class SimpleMovement : MonoBehaviour
 
     private void ApplyRotation()
     {
-        if (Mathf.Abs(rotationInput) > 0f || Mathf.Abs(rotationNoise) > 0f)
-        {
-            float noise = GaussianSampler.SampleGaussian(0, rotationNoise);
+        float noise = GaussianSampler.SampleGaussian(0, rotationNoise);
 
-            float rotation = rotationInput * rotationSpeed * Time.fixedDeltaTime + noise * Time.fixedDeltaTime;
-            Quaternion deltaRotation = Quaternion.Euler(0f, rotation, 0f);
-            rb.MoveRotation(rb.rotation * deltaRotation);
-        }
+        float rotation = rotationInput * rotationSpeed * Time.deltaTime + noise * Time.deltaTime;
+        Quaternion deltaRotation = Quaternion.Euler(0f, rotation, 0f);
+        rb.MoveRotation(rb.rotation * deltaRotation);
     }
 
     // --- Debug Text Gizmos ---

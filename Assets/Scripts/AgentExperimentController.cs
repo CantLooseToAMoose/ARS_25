@@ -9,9 +9,7 @@ public class AgentExperimentController : MonoBehaviour
 
     public RobotNavigationExperimentController ExperimentController;
     public int AgentId { get; set; }
-
-    private SimpleMovement movement;
-    private Rigidbody rb;
+    
 
     private Vector3 previousPosition;
     private float totalDistance = 0f;
@@ -30,8 +28,6 @@ public class AgentExperimentController : MonoBehaviour
 
     void Start()
     {
-        movement = GetComponent<SimpleMovement>();
-        rb = GetComponent<Rigidbody>();
         nnController = GetComponent<NeuralNetController>();
         previousPosition = transform.position;
     }
@@ -48,8 +44,6 @@ public class AgentExperimentController : MonoBehaviour
         if (!goalReached)
         {
             goalReached = true;
-            movement.Move(0f);
-            movement.Rotate(0f);
             nnController?.StopControl();
             Debug.Log($"[Agent {AgentId}] Timeout after {maxTime:F2} seconds");
             LogResults();
@@ -83,8 +77,6 @@ public class AgentExperimentController : MonoBehaviour
         if (Vector3.Distance(transform.position, goalTransform.position) < goalThreshold)
         {
             goalReached = true;
-            movement.Move(0f);
-            movement.Rotate(0f);
             nnController?.StopControl();
             LogResults();
         }

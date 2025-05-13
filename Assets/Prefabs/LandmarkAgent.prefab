@@ -252,7 +252,7 @@ MonoBehaviour:
   speed: 5
   rotationSpeed: 200
   movementNoise: 0
-  rotationNoise: 0.02
+  rotationNoise: 0
 --- !u!114 &4395669740212311318
 MonoBehaviour:
   m_ObjectHideFlags: 0

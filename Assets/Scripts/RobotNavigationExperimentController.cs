@@ -40,10 +40,10 @@ public class RobotNavigationExperimentController : MonoBehaviour
         do
         {
             sharedSpawnPos = Random.insideUnitSphere * spawnRadius;
-            sharedSpawnPos.y = 0f;
+            sharedSpawnPos.y = 1f;
 
             sharedGoalPos = Random.insideUnitSphere * spawnRadius;
-            sharedGoalPos.y = 0f;
+            sharedGoalPos.y = 1f;
 
             float distance = Vector3.Distance(sharedSpawnPos, sharedGoalPos);
 

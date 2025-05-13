@@ -101,7 +101,7 @@ public class NeuralNetController : MonoBehaviour
         return weights.ToArray();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (nnWeight.Length != 78)
         {
@@ -111,10 +111,14 @@ public class NeuralNetController : MonoBehaviour
 
         // Get all Lidar distances
         LidarSensors.RaycastResult[] lastScan = LidarSensors.LastScan;
-        for (int i = 0; i < lastScan.Length; i++)
+        if (lastScan!=null)
         {
-            lidarDistances[i] = lastScan[i].distance;
+            for (int i = 0; i < lastScan.Length; i++)
+            {
+                lidarDistances[i] = lastScan[i].distance;
+            }
         }
+
 
         // Calculate goal heading
         Vector3 goalPosition = ExperimentController.goalTransform.position;
