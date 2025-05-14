@@ -362,8 +362,8 @@ MonoBehaviour:
   LidarSensors: {fileID: 4395669740212311324}
   worldWidth: 50
   worldHeight: 50
-  mapResolution: 0.3
-  beamStepSize: 0.1
+  mapResolution: 1
+  beamStepSize: 0.8
 --- !u!114 &3609735664517245332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,4 +500,4 @@ MonoBehaviour:
   mapSize: {x: 50, y: 50}
   useExistingWeights: 0
   pathToExistingWeightsFile: best_weights.csv
-  debug: 1
+  debug: 0
