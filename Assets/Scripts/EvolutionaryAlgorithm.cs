@@ -14,6 +14,10 @@ public class EvolutionaryAlgorithm
     // Individual genome length
     public int GenomeLength { get; set; } = 10;
 
+    private Queue<float[]> eliteHistory = new Queue<float[]>();
+    private const int EliteHistorySize = 5;
+
+
     private readonly System.Random _rng = new System.Random();
 
     /// <summary>
@@ -80,16 +84,8 @@ public class EvolutionaryAlgorithm
 
         for (int i = 0; i < PopulationSize; i++)
         {
-            // Start with a copy of parent i
             float[] child = (float[])population[i].Clone();
 
-            // Elitism: keep the best 5 individuals
-            if (i % 5 == 0 && i < PopulationSize / 5)
-            {
-                nextGen.Add(child);
-                continue;
-            }
-            
             // Crossover
             if (UnityEngine.Random.value < CrossoverRate)
             {
@@ -108,7 +104,6 @@ public class EvolutionaryAlgorithm
                 if (UnityEngine.Random.value < MutationRate)
                 {
                     child[gene] += UnityEngine.Random.Range(-0.1f, 0.1f);
-                    // Optional: clamp to [0,1]
                     child[gene] = Mathf.Clamp(child[gene], -1f, 1f);
                 }
             }
@@ -116,8 +111,22 @@ public class EvolutionaryAlgorithm
             nextGen.Add(child);
         }
 
+        // Inject elite history genomes
+        foreach (var elite in eliteHistory)
+        {
+            if (nextGen.Count < PopulationSize)
+                nextGen.Add((float[])elite.Clone());
+        }
+
+        // Ensure fixed size
+        while (nextGen.Count > PopulationSize)
+        {
+            nextGen.RemoveAt(UnityEngine.Random.Range(0, nextGen.Count));
+        }
+
         return nextGen;
     }
+
 
     /// <summary>
     /// Runs the evolutionary algorithm and returns the best-found individual.
@@ -141,6 +150,15 @@ public class EvolutionaryAlgorithm
                 {
                     bestFitness = fit;
                     bestIndividual = population[i];
+                }
+
+                // Always add best of this generation to elite history
+                float[] bestOfThisGen = population[fitnesses.IndexOf(Mathf.Max(fitnesses.ToArray()))];
+                eliteHistory.Enqueue((float[])bestOfThisGen.Clone());
+
+                if (eliteHistory.Count > EliteHistorySize)
+                {
+                    eliteHistory.Dequeue(); // Keep only last 5
                 }
             }
 

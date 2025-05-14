@@ -19,9 +19,8 @@ public class EvolutionExperimentManager : MonoBehaviour
     private List<float[]> population;
     private EvolutionaryAlgorithm ea;
 
-    private float[] bestIndividual;
+    private float[] bestIndividual; // best across all generations
     private float bestFitness = float.MinValue;
-
 
     private List<FitnessLogEntry> fitnessLog = new List<FitnessLogEntry>();
 
@@ -43,14 +42,13 @@ public class EvolutionExperimentManager : MonoBehaviour
 
     private void StartGeneration()
     {
-        Time.timeScale = timeScale; // or higher (10, 20...), depending on your system performance
-
+        Time.timeScale = timeScale;
         StartCoroutine(DelayedStart());
     }
 
     private IEnumerator DelayedStart()
     {
-        yield return new WaitForSeconds(0.5f); // delay to let cleanup finish
+        yield return new WaitForSeconds(0.5f);
         Debug.Log($"🚀 Starting generation {currentGeneration + 1}/{maxGenerations}");
 
         float[][] batchWeights = new float[experimentController.numberOfAgents][];
@@ -76,24 +74,20 @@ public class EvolutionExperimentManager : MonoBehaviour
             var otherTimeElapsed = results[i].TimeElapsed;
             var otherCollisionCount = results[i].Collisions;
 
-            // Check if the other agent is better in all objectives
             if (otherTotalDistance > totalDistance && otherTimeElapsed < timeElapsed &&
                 otherCollisionCount <= collisionCount)
             {
-                return true; // Dominated
+                return true;
             }
         }
 
-        return false; // Not dominated
+        return false;
     }
 
     public void OnGenerationCompleteMultiObj(Dictionary<int, AgentExperimentResult> results)
     {
-        // Multi-objective optimization
-
         var nonDominated = new List<float[]>();
 
-        // Identify non-dominated individuals
         for (int i = 0; i < results.Count; i++)
         {
             if (!IsDominated(results, i))
@@ -104,7 +98,6 @@ public class EvolutionExperimentManager : MonoBehaviour
 
         var newPopulation = new List<float[]>(populationSize);
 
-        // Fill with non-dominated individuals
         for (int i = 0; i < populationSize; i++)
         {
             if (i < nonDominated.Count)
@@ -113,7 +106,6 @@ public class EvolutionExperimentManager : MonoBehaviour
             }
             else
             {
-                // Crossover: create a new child
                 int parent1Index = UnityEngine.Random.Range(0, nonDominated.Count);
                 int parent2Index = UnityEngine.Random.Range(0, nonDominated.Count);
                 float[] parent1 = nonDominated[parent1Index];
@@ -125,7 +117,6 @@ public class EvolutionExperimentManager : MonoBehaviour
                     child[gene] = UnityEngine.Random.value < 0.5f ? parent1[gene] : parent2[gene];
                 }
 
-                // Mutation
                 for (int gene = 0; gene < genomeLength; gene++)
                 {
                     if (UnityEngine.Random.value < mutationRate)
@@ -134,7 +125,7 @@ public class EvolutionExperimentManager : MonoBehaviour
                     }
                 }
 
-                newPopulation.Add(child); // Add the child to the new population
+                newPopulation.Add(child);
             }
         }
 
@@ -157,6 +148,9 @@ public class EvolutionExperimentManager : MonoBehaviour
         Debug.Log($"✅ Generation {currentGeneration + 1} complete");
 
         var fitnesses = new List<float>(populationSize);
+        float generationBestFitness = float.NegativeInfinity;
+        float[] bestOfCurrentGeneration = null;
+
         for (int i = 0; i < experimentController.numberOfAgents; i++)
         {
             var result = results[i];
@@ -169,17 +163,24 @@ public class EvolutionExperimentManager : MonoBehaviour
                 bestFitness = fitness;
                 bestIndividual = population[i];
             }
+
+            if (fitness > generationBestFitness)
+            {
+                generationBestFitness = fitness;
+                bestOfCurrentGeneration = population[i];
+            }
         }
+
+        Debug.Log($"🏅 Generation {currentGeneration + 1} best fitness: {generationBestFitness:F4}");
 
         var parents = ea.SelectParents(population, fitnesses, numParents);
         population = ea.CrossoverAndMutate(parents);
 
         currentGeneration++;
 
-        // Save best individual every 100 generations
         if (currentGeneration % 100 == 0)
         {
-            ExportBestIndividualToCSV($"best_weights_gen_{currentGeneration}.csv");
+            ExportBestIndividualToCSV($"best_weights_gen_{currentGeneration}.csv", bestOfCurrentGeneration, generationBestFitness);
         }
 
         fitnessLog.Add(new FitnessLogEntry
@@ -197,9 +198,8 @@ public class EvolutionExperimentManager : MonoBehaviour
             Time.timeScale = 1f;
             Debug.Log("🎉 Evolution complete");
             ExportFitnessLogToCSV("fitness_log.csv");
-            ExportBestIndividualToCSV("best_weights.csv");
+            ExportBestIndividualToCSV("best_weights_final_generation.csv", bestOfCurrentGeneration, generationBestFitness);
         }
-
     }
 
     private void ExportFitnessLogToCSV(string filename)
@@ -207,7 +207,6 @@ public class EvolutionExperimentManager : MonoBehaviour
         string path = System.IO.Path.Combine(Application.dataPath, filename);
         using (System.IO.StreamWriter writer = new System.IO.StreamWriter(path))
         {
-            // Header
             writer.WriteLine("Generation,Fitness");
 
             foreach (var entry in fitnessLog)
@@ -222,23 +221,22 @@ public class EvolutionExperimentManager : MonoBehaviour
         Debug.Log($"📄 Fitness log exported to: {path}");
     }
 
-    private void ExportBestIndividualToCSV(string filename)
+    private void ExportBestIndividualToCSV(string filename, float[] individual, float fitness)
     {
-        if (bestIndividual == null) return;
+        if (individual == null) return;
 
         string path = System.IO.Path.Combine(Application.dataPath, filename);
         using (System.IO.StreamWriter writer = new System.IO.StreamWriter(path))
         {
-            writer.WriteLine("GeneIndex,Weight");
-            for (int i = 0; i < bestIndividual.Length; i++)
+            writer.WriteLine("GeneIndex;Weight");
+            for (int i = 0; i < individual.Length; i++)
             {
-                writer.WriteLine($"{i}; {bestIndividual[i]}");
+                writer.WriteLine($"{i}; {individual[i]}");
             }
         }
 
-        Debug.Log($"🏆 Best weights exported to: {path} (Fitness: {bestFitness:F3})");
+        Debug.Log($"🏁 Final generation best weights saved: {path} (Fitness: {fitness:F3})");
     }
-
 
     private float CalculateFitness(AgentExperimentResult result)
     {
@@ -250,18 +248,13 @@ public class EvolutionExperimentManager : MonoBehaviour
         }
         else
         {
-            // Penalize based on final distance to goal (normalized)
             float normalizedDistance = Mathf.Clamp01(result.FinalDistanceToGoal / experimentController.spawnRadius);
-            fitness += 1f - normalizedDistance; // reward small distances
+            fitness += 1f - normalizedDistance;
         }
-        
-        // Reward faster solutions
-        fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
 
-        // Penalize collisions
+        fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
         fitness -= 0.01f * result.Collisions;
 
-        // Debug.Log(fitness);
         return fitness;
     }
 }
