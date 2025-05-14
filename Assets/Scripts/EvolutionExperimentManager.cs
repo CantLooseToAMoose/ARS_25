@@ -245,16 +245,16 @@ public class EvolutionExperimentManager : MonoBehaviour
         {
             // Penalize based on final distance to goal (normalized)
             float normalizedDistance = Mathf.Clamp01(result.FinalDistanceToGoal / experimentController.spawnRadius);
-            fitness -= normalizedDistance; // penalize large distances
+            fitness += 1f - normalizedDistance; // reward small distances
         }
         
         // Reward faster solutions
         fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
 
         // Penalize collisions
-        fitness -= 0.1f * result.Collisions;
+        // fitness -= 0.1f * result.Collisions;
 
-        Debug.Log(fitness);
+        // Debug.Log(fitness);
         return Mathf.Max(0f, fitness);
     }
 }

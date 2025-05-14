@@ -56,19 +56,63 @@ public class SimpleMovement : MonoBehaviour
 
     private void ApplyMovement()
     {
+        // If moveInput == NaN, it will be ignored
+        if (float.IsNaN(moveInput))
+        {
+            // Debug.Log("NaN detected in move input");
+            // Debug.Log($"moveInput: {moveInput}, speed: {speed}");
+            return;
+        }
+
+        if (moveInput == 0f)
+        {
+            rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+            return;
+        }
+
         float noise = 1f + GaussianSampler.SampleGaussian(0f, movementNoise);
 
-
         Vector3 forwardVelocity = transform.forward * (moveInput * noise * speed);
+
+        // Check for bugs
+        if (float.IsNaN(forwardVelocity.x) || float.IsNaN(forwardVelocity.z))
+        {
+            // Debug.Log("NaN detected in forward velocity");
+            // Debug.Log($"moveInput: {moveInput}, noise: {noise}, speed: {speed}, forwardVelocity: {forwardVelocity}");
+            forwardVelocity = Vector3.zero;
+        }
+
         rb.velocity = new Vector3(forwardVelocity.x, rb.velocity.y, forwardVelocity.z);
     }
 
     private void ApplyRotation()
     {
+        // If rotationInput == NaN, it will be ignored
+        if (float.IsNaN(rotationInput))
+        {
+            // Debug.Log("NaN detected in rotation input");
+            // Debug.Log($"rotationInput: {rotationInput}, rotationSpeed: {rotationSpeed}");
+            return;
+        }
+
+        if (rotationInput == 0f)
+        {
+            return;
+        }
+
         float noise = GaussianSampler.SampleGaussian(0, rotationNoise);
 
         float rotation = rotationInput * rotationSpeed * Time.deltaTime + noise * Time.deltaTime;
         Quaternion deltaRotation = Quaternion.Euler(0f, rotation, 0f);
+
+        // Check for bugs
+        if (float.IsNaN(deltaRotation.x) || float.IsNaN(deltaRotation.y) || float.IsNaN(deltaRotation.z))
+        {
+            // Debug.Log("NaN detected in delta rotation");
+            // Debug.Log($"rotationInput: {rotationInput}, rotationSpeed: {rotationSpeed}, deltaRotation: {deltaRotation}");
+            return;
+        }
+
         rb.MoveRotation(rb.rotation * deltaRotation);
     }
 

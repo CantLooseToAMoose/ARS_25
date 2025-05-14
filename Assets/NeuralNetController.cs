@@ -13,8 +13,8 @@ public class NeuralNetController : MonoBehaviour
     public Localizer Localizer;
     public AgentExperimentController ExperimentController;
     public MapBehaviour MapBehaviour;
-    public int mapDiscretizationFactor_x = 10;
-    public int mapDiscretizationFactor_y = 10;
+    
+    public int localMapSize = 10;
 
 
     [HideInInspector] public float[] lidarDistances = new float[12];
@@ -162,10 +162,10 @@ public class NeuralNetController : MonoBehaviour
         bool mapping = MapBehaviour != null && MapBehaviour.isActiveAndEnabled;
 
 
-        int inputDim = 2 + 12;
+        int inputDim = 2 + 2 + 12;
         if (mapping)
         {
-            inputDim += 5 + mapDiscretizationFactor_x * mapDiscretizationFactor_y;
+            inputDim += 5 + localMapSize * localMapSize;
         }
 
         float[] input = new float[inputDim];
@@ -174,10 +174,14 @@ public class NeuralNetController : MonoBehaviour
         input[0] = goalHeading[0];
         input[1] = goalHeading[1];
 
+        // Set previous control
+        input[2] = previousControl[0];
+        input[3] = previousControl[1];
+
         // Set the lidar distances (12)
         for (int i = 0; i < lidarDistances.Length; i++)
         {
-            input[i + 2] = lidarDistances[i] / LidarSensors.maxLength;
+            input[i + 4] = lidarDistances[i] / LidarSensors.maxLength;
         }
 
         // 
@@ -185,47 +189,36 @@ public class NeuralNetController : MonoBehaviour
         if (mapping)
         {
             // Set goal position
-            input[14] = goalPosition.x / mapSize.x;
-            input[15] = goalPosition.z / mapSize.y;
+            input[16] = goalPosition.x / mapSize.x;
+            input[17] = goalPosition.z / mapSize.y;
 
             // Set the pose estimate
-            input[16] = estimatePosition.x / mapSize.x;
-            input[17] = estimatePosition.y / mapSize.y;
-            input[18] = estimateAngle / 360;
+            var esitimatePosX = estimatePosition.x / mapSize.x;
+            var esitimatePosY = estimatePosition.y / mapSize.y;
+
+            input[18] = esitimatePosX;
+            input[19] = esitimatePosY;
+            input[20] = estimateAngle / 360;
 
             // Assume Mapping.map is a 2D array of some kind (e.g., int[,], float[,], or a custom struct[,])
             var map = MapBehaviour.Mapping.map;
-            float width = MapBehaviour.Mapping.maxWidth - MapBehaviour.Mapping.minWidth;
-            float height = MapBehaviour.Mapping.maxHeight - MapBehaviour.Mapping.minHeight;
-
-            for (int i = 0; i < mapDiscretizationFactor_x; i++)
+            int width = (int)Math.Round(MapBehaviour.Mapping.maxWidth - MapBehaviour.Mapping.minWidth);
+            int height = (int)Math.Round(MapBehaviour.Mapping.maxHeight - MapBehaviour.Mapping.minHeight);
+            // Getting a local map based on the agents 5, 5 surrounding, so check on the agents position for the relevant tiles
+            int count = 0;
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < mapDiscretizationFactor_y; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    int index = i * mapDiscretizationFactor_y + j + 18;
-                    
-                    float sum = 0f;
-                    int count = 0;
-
-                    // Coordinates for the top-left of the sub-grid
-                    var gridSizeX = (int)width / mapDiscretizationFactor_x;
-                    var gridSizeY = (int)height / mapDiscretizationFactor_y;
-
-                    int startX = i * gridSizeX;
-                    int startY = j * gridSizeY;
-
-                    // Sum up values in the sub-grid
-                    for (int x = startX; x < startX + gridSizeX; x++)
+                    // Check if the current grid cell is within the local map size, based on esitimatePosX and esitimatePosY
+                    if (i >= esitimatePosX - localMapSize / 2 && i <= esitimatePosX + localMapSize / 2 &&
+                        j >= esitimatePosY - localMapSize / 2 && j <= esitimatePosY + localMapSize / 2)
                     {
-                        for (int y = startY; y < startY + gridSizeY; y++)
-                        {
-                            sum += 1.0f - 1.0f / (1.0f + Mathf.Exp(map[x, y]));
-                            count++;
-                        }
-                    }
+                        // Normalize the map value to be between 0 and 1
+                        input[count+ 21] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
 
-                    // Store average log-odds (or use sum if you prefer)
-                    input[index] = sum / count;
+                        count++;
+                    }
                 }
             }
         }
@@ -235,7 +228,7 @@ public class NeuralNetController : MonoBehaviour
             Debug.Log("Input: [" + string.Join(", ", input) + "]");
         }
 
-        previousControl = ANeuralNet.FeedForward(input, nnWeight, new[] { inputDim, 64, 32, 2 });
+        previousControl = ANeuralNet.FeedForward(input, nnWeight, new[] { inputDim, 16, 8, 2 });
         // Debug.Log("Neural net controls: x:" + previousControl[0] + "y:" + previousControl[1]);
         movement.Move(previousControl[0]);
         movement.Rotate(previousControl[1]);
