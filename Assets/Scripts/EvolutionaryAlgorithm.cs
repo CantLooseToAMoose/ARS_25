@@ -83,6 +83,13 @@ public class EvolutionaryAlgorithm
             // Start with a copy of parent i
             float[] child = (float[])population[i].Clone();
 
+            // Elitism: keep the best individual
+            if (i == 0)
+            {
+                nextGen.Add(child);
+                continue;
+            }
+
             // Crossover
             if (UnityEngine.Random.value < CrossoverRate)
             {
