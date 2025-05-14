@@ -325,7 +325,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minDistance: 0.1
   dotSpacing: 4
-  debug: 1
+  debug: 0
 --- !u!114 &4395669740212311324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,8 +400,7 @@ MonoBehaviour:
   Localizer: {fileID: 4395669740212311326}
   ExperimentController: {fileID: 3609735664517245332}
   MapBehaviour: {fileID: 0}
-  mapDiscretizationFactor_x: 10
-  mapDiscretizationFactor_y: 10
+  localMapSize: 10
   lidarDistances:
   - 0
   - 0

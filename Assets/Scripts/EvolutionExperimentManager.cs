@@ -176,6 +176,12 @@ public class EvolutionExperimentManager : MonoBehaviour
 
         currentGeneration++;
 
+        // Save best individual every 100 generations
+        if (currentGeneration % 100 == 0)
+        {
+            ExportBestIndividualToCSV($"best_weights_gen_{currentGeneration}.csv");
+        }
+
         fitnessLog.Add(new FitnessLogEntry
         {
             Generation = currentGeneration,
@@ -193,6 +199,7 @@ public class EvolutionExperimentManager : MonoBehaviour
             ExportFitnessLogToCSV("fitness_log.csv");
             ExportBestIndividualToCSV("best_weights.csv");
         }
+
     }
 
     private void ExportFitnessLogToCSV(string filename)
@@ -252,10 +259,10 @@ public class EvolutionExperimentManager : MonoBehaviour
         fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
 
         // Penalize collisions
-        // fitness -= 0.1f * result.Collisions;
+        fitness -= 0.01f * result.Collisions;
 
         // Debug.Log(fitness);
-        return Mathf.Max(0f, fitness);
+        return fitness;
     }
 }
 
