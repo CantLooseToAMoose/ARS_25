@@ -225,7 +225,7 @@ public class EvolutionExperimentManager : MonoBehaviour
             writer.WriteLine("GeneIndex,Weight");
             for (int i = 0; i < bestIndividual.Length; i++)
             {
-                writer.WriteLine($"{i},{bestIndividual[i]}");
+                writer.WriteLine($"{i}; {bestIndividual[i]}");
             }
         }
 

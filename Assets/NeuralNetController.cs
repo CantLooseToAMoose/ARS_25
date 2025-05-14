@@ -42,6 +42,7 @@ public class NeuralNetController : MonoBehaviour
             var loaded = LoadWeightsFromCSV(pathToExistingWeightsFile);
             if (loaded != null)
             {
+                Debug.Log("Loaded Weights: [" + string.Join(", ", loaded) + "]");
                 SetWeights(loaded);
                 Debug.Log("Loaded weights from file: " + pathToExistingWeightsFile);
             }
@@ -103,7 +104,7 @@ public class NeuralNetController : MonoBehaviour
                         continue;
                     }
 
-                    string[] parts = line.Split(',');
+                    string[] parts = line.Split(';');
                     if (parts.Length >= 2 && float.TryParse(parts[1], out float weight))
                     {
                         weights.Add(weight);

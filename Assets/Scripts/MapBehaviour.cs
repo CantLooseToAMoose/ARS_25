@@ -40,7 +40,7 @@ public class MapBehaviour : MonoBehaviour
                 sb.AppendLine();
             }
 
-            Debug.Log(sb.ToString());
+            // Debug.Log(sb.ToString());
         }
     }
 }
