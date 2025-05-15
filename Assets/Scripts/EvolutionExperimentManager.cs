@@ -250,7 +250,7 @@ public class EvolutionExperimentManager : MonoBehaviour
         else
         {
             float normalizedDistance = Mathf.Clamp01(result.FinalDistanceToGoal / experimentController.spawnRadius);
-            fitness += fitness += Mathf.Pow(1f - normalizedDistance, 2f);
+            fitness += 1f - normalizedDistance;
         }
 
         fitness += Mathf.Clamp01(1f - (result.TimeElapsed / experimentController.maxExperimentTime));
