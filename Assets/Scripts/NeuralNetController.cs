@@ -182,6 +182,8 @@ public class NeuralNetController : MonoBehaviour
             inputDim += localMapSize * localMapSize;
         }
 
+        // Debug.Log("Input dimension: " + inputDim);
+
         float[] input = new float[inputDim];
         for (int i = 0; i < input.Length; i++)
         {
@@ -197,9 +199,12 @@ public class NeuralNetController : MonoBehaviour
         input[3] = previousControl[1];
 
         // Set the lidar distances (12)
+        int idx = 4;
         for (int i = 0; i < lidarDistances.Length; i++)
         {
-            input[i + 4] = lidarDistances[i] / LidarSensors.maxLength;
+            input[idx] = lidarDistances[i] / LidarSensors.maxLength;
+
+            idx++;
         }
 
         // 
@@ -229,19 +234,20 @@ public class NeuralNetController : MonoBehaviour
             // Debug.Log("Map size: " + width + " " + height);
 
             // Getting a local map based on the agents 5, 5 surrounding, so check on the agents position for the relevant tiles
-            int count = 0;
-            for (int i = 0; i < width; i++)
+            // int count = 0;
+            for (int i = 0; i < width + 1; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < height + 1; j++)
                 {
                     // Check if the current grid cell is within the local map size, based on esitimatePosX and esitimatePosY
-                    if (i >= esitimatePosX - localMapSize / 2 && i <= esitimatePosX + localMapSize / 2 &&
-                        j >= esitimatePosY - localMapSize / 2 && j <= esitimatePosY + localMapSize / 2)
+                    if (i >= esitimatePosX - localMapSize / 2 && i < esitimatePosX + localMapSize / 2 &&
+                        j >= esitimatePosY - localMapSize / 2 && j < esitimatePosY + localMapSize / 2)
                     {
                         // Normalize the map value to be between 0 and 1
-                        input[count + 16] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
+                        var logOdds = map[i, j];
+                        input[idx] = 1.0f - 1.0f / (1.0f + Mathf.Exp(logOdds));
 
-                        count++;
+                        idx++;
                     }
                 }
             }
