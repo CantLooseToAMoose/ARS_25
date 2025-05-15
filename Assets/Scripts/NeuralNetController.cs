@@ -239,7 +239,7 @@ public class NeuralNetController : MonoBehaviour
                         j >= esitimatePosY - localMapSize / 2 && j <= esitimatePosY + localMapSize / 2)
                     {
                         // Normalize the map value to be between 0 and 1
-                        input[count + 21] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
+                        input[count + 16] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
 
                         count++;
                     }
