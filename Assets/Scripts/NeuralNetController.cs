@@ -141,11 +141,11 @@ public class NeuralNetController : MonoBehaviour
         Vector3 stateEstimate = Localizer.stateEstimate;
         Vector2 estimatePosition = new Vector2(stateEstimate.y, stateEstimate.x); // (x, z) mapping
 
-         // Fix: Convert radians to degrees, flip clockwise to CCW, wrap to [0,360)
+        // Fix: Convert radians to degrees, flip clockwise to CCW, wrap to [0,360)
         float estimateAngle = (360f - (stateEstimate.z * Mathf.Rad2Deg)) % 360f;
 
         // Fix: Convert heading-from-Z to heading-from-X
-        float estimateAngleFromX = estimateAngle +90f;
+        float estimateAngleFromX = estimateAngle + 90f;
 
         Vector2 goalDifferenceVector = goalPosition2D - estimatePosition;
         float distance = goalDifferenceVector.magnitude;
@@ -183,6 +183,10 @@ public class NeuralNetController : MonoBehaviour
         }
 
         float[] input = new float[inputDim];
+        for (int i = 0; i < input.Length; i++)
+        {
+            input[i] = 1;
+        }
 
         // Set the goal heading
         input[0] = goalHeading[0];

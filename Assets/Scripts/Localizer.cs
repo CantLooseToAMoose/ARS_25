@@ -66,7 +66,7 @@ public class Localizer : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
-        DrawEstimateLabel();
+        // DrawEstimateLabel();
         // DrawPredictedTrajectory();
         // DrawCovarianceEllipse();
     }
