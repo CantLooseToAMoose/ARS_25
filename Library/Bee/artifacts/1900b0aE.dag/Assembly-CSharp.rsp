@@ -366,6 +366,7 @@
 "Assets/Scripts/PlayerInputController.cs"
 "Assets/Scripts/RobotNavigationExperimentController.cs"
 "Assets/Scripts/SimpleMovement.cs"
+"Assets/Scripts/SingleAgentExperimentRunner.cs"
 "Assets/Scripts/Triangulation.cs"
 -langversion:9.0
 /deterministic

@@ -12,16 +12,20 @@ public class SingleAgentExperimentRunner : MonoBehaviour
     public LayerMask obstacleLayer;
     public int batchSize = 10;
     public int totalTrials = 100;
+    public float timeScale = 2f;
 
     public string outputCsvFileName = "SingleAgentResults.csv";
 
     private List<AgentExperimentResult> results = new List<AgentExperimentResult>();
+    private List<GameObject> spawnedAgents = new List<GameObject>();
+    private List<GameObject> spawnedGoals = new List<GameObject>();
 
     private int completedCount = 0;
     private int currentBatchSize = 0;
 
     public void RunExperiments()
     {
+        Time.timeScale = timeScale;
         StartCoroutine(RunBatchedExperiments(totalTrials, batchSize));
     }
 
@@ -36,16 +40,33 @@ public class SingleAgentExperimentRunner : MonoBehaviour
             currentBatchSize = trialsThisBatch;
             completedCount = 0;
 
+            spawnedAgents.Clear();
+            spawnedGoals.Clear();
+
             for (int i = 0; i < trialsThisBatch; i++)
             {
                 StartCoroutine(RunSingleExperiment(trialId++));
                 trialsRun++;
             }
 
+            // Wait until the current batch finishes
             while (completedCount < currentBatchSize)
             {
                 yield return null;
             }
+
+            // Cleanup
+            foreach (var agent in spawnedAgents)
+            {
+                if (agent != null) Destroy(agent);
+            }
+
+            foreach (var goal in spawnedGoals)
+            {
+                if (goal != null) Destroy(goal);
+            }
+
+            yield return null;
         }
 
         SaveResultsToCsv();
@@ -88,6 +109,9 @@ public class SingleAgentExperimentRunner : MonoBehaviour
         GameObject agent = Instantiate(agentPrefab, spawnPos, Quaternion.identity);
         GameObject goal = Instantiate(goalPrefab, goalPos, Quaternion.identity);
 
+        spawnedAgents.Add(agent);
+        spawnedGoals.Add(goal);
+
         var controller = agent.GetComponent<AgentExperimentController>();
         controller.goalTransform = goal.transform;
         controller.AgentId = trialId;
@@ -98,7 +122,6 @@ public class SingleAgentExperimentRunner : MonoBehaviour
 
         controller.StartExperiment(maxExperimentTime);
 
-        // We don't need to wait here; SubmitResult() will be called later
         yield return null;
     }
 
@@ -113,11 +136,11 @@ public class SingleAgentExperimentRunner : MonoBehaviour
         string path = Path.Combine(Application.dataPath, outputCsvFileName);
         using (StreamWriter writer = new StreamWriter(path))
         {
-            writer.WriteLine("AgentId,GoalReached,TimeElapsed,TotalDistance,Collisions,FinalDistanceToGoal,Fitness");
+            writer.WriteLine("AgentId;GoalReached;TimeElapsed;TotalDistance;Collisions;FinalDistanceToGoal;Fitness");
 
             foreach (var result in results)
             {
-                writer.WriteLine($"{result.AgentId},{result.GoalReached},{result.TimeElapsed},{result.TotalDistance},{result.Collisions},{result.FinalDistanceToGoal},{result.Fitness}");
+                writer.WriteLine($"{result.AgentId};{result.GoalReached};{result.TimeElapsed};{result.TotalDistance};{result.Collisions};{result.FinalDistanceToGoal};{result.Fitness}");
             }
         }
 

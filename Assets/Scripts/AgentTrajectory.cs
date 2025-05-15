@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[ExecuteAlways] // Allows drawing in Edit mode too
+[ExecuteAlways]
 public class AgentTrajectory : MonoBehaviour
 {
-    [Header("Trajectory Settings")] public float minDistance = 0.1f; // Minimum distance between recorded points
-    public float dotSpacing = 4f; // Spacing between dots in pixels
+    [Header("Trajectory Settings")]
+    public float minDistance = 0.1f;
+    public float dotSpacing = 4f;
 
     private List<Vector3> trajectoryPoints = new List<Vector3>();
     private Vector3 lastPosition;
@@ -31,13 +32,10 @@ public class AgentTrajectory : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (!debug)
-        {
+        if (!debug || trajectoryPoints == null || trajectoryPoints.Count < 2)
             return;
-        }
-#if UNITY_EDITOR
-        if (trajectoryPoints.Count < 2) return;
 
+#if UNITY_EDITOR
         Handles.color = Color.blue;
 
         for (int i = 0; i < trajectoryPoints.Count - 1; i++)
@@ -52,5 +50,10 @@ public class AgentTrajectory : MonoBehaviour
         trajectoryPoints.Clear();
         lastPosition = transform.position;
         trajectoryPoints.Add(lastPosition);
+    }
+
+    private void OnDestroy()
+    {
+        trajectoryPoints?.Clear();
     }
 }

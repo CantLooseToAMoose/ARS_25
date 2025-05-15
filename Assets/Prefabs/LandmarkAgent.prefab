@@ -346,6 +346,7 @@ MonoBehaviour:
   offset: {x: 0, y: 0, z: 0}
   radiusOffset: 0.1
   hitSphereSize: 0.1
+  drawDebugGizmos: 1
 --- !u!114 &4395669740212311323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,6 +380,7 @@ MonoBehaviour:
   goalTransform: {fileID: 0}
   goalThreshold: 1
   ExperimentController: {fileID: 0}
+  SingleAgentExperimentRunner: {fileID: 0}
   obstacleCheckRadius: 1.1
   obstacleLayer:
     serializedVersion: 2

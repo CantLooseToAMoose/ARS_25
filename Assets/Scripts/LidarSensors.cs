@@ -21,13 +21,17 @@ public class LidarSensors : MonoBehaviour
 
     [Tooltip("Distance from center to begin raycasting (to simulate radius)")]
     public float radiusOffset = 0f;
-    
+
     public RaycastResult[] LastScan { get; private set; }
 
     #region Debug Settings
 
-    [Header("Debug Settings")] [Tooltip("The radius of the sphere drawn at hit points")]
+    [Header("Debug Settings")] 
+    [Tooltip("The radius of the sphere drawn at hit points")]
     public float hitSphereSize = 0.1f;
+
+    [Tooltip("Enable to draw lidar debug gizmos")]
+    public bool drawDebugGizmos = true;
 
     #endregion
 
@@ -55,6 +59,8 @@ public class LidarSensors : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
+        if (!drawDebugGizmos) return;
+
         Vector3 origin = transform.position;
         RaycastResult[] rayResults = PerformRaycasts(origin);
 
@@ -131,5 +137,4 @@ public class LidarSensors : MonoBehaviour
 
         return directions;
     }
-    
 }
