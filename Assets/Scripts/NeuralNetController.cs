@@ -211,8 +211,11 @@ public class NeuralNetController : MonoBehaviour
             // input[17] = goalPosition.z / mapSize.y;
 
             // Set the pose estimate
-            var esitimatePosX = estimatePosition.x / mapSize.x;
-            var esitimatePosY = estimatePosition.y / mapSize.y;
+            var esitimatePosX = estimatePosition.x + 25;
+            var esitimatePosY = estimatePosition.y + 25;
+
+            
+            // Debug.Log("Estimating position: " + esitimatePosX + " " + esitimatePosY);
 
             // input[18] = esitimatePosX;
             // input[19] = esitimatePosY;
@@ -222,6 +225,9 @@ public class NeuralNetController : MonoBehaviour
             var map = MapBehaviour.Mapping.map;
             int width = (int)Math.Round(MapBehaviour.Mapping.maxWidth - MapBehaviour.Mapping.minWidth);
             int height = (int)Math.Round(MapBehaviour.Mapping.maxHeight - MapBehaviour.Mapping.minHeight);
+
+            // Debug.Log("Map size: " + width + " " + height);
+
             // Getting a local map based on the agents 5, 5 surrounding, so check on the agents position for the relevant tiles
             int count = 0;
             for (int i = 0; i < width; i++)
