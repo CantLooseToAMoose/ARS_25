@@ -179,7 +179,7 @@ public class NeuralNetController : MonoBehaviour
         int inputDim = 2 + 2 + 12;
         if (mapping)
         {
-            inputDim += 5 + localMapSize * localMapSize;
+            inputDim += localMapSize * localMapSize;
         }
 
         float[] input = new float[inputDim];
@@ -203,16 +203,16 @@ public class NeuralNetController : MonoBehaviour
         if (mapping)
         {
             // Set goal position
-            input[16] = goalPosition.x / mapSize.x;
-            input[17] = goalPosition.z / mapSize.y;
+            // input[16] = goalPosition.x / mapSize.x;
+            // input[17] = goalPosition.z / mapSize.y;
 
             // Set the pose estimate
             var esitimatePosX = estimatePosition.x / mapSize.x;
             var esitimatePosY = estimatePosition.y / mapSize.y;
 
-            input[18] = esitimatePosX;
-            input[19] = esitimatePosY;
-            input[20] = estimateAngle / 360;
+            // input[18] = esitimatePosX;
+            // input[19] = esitimatePosY;
+            // input[20] = estimateAngle / 360;
 
             // Assume Mapping.map is a 2D array of some kind (e.g., int[,], float[,], or a custom struct[,])
             var map = MapBehaviour.Mapping.map;
