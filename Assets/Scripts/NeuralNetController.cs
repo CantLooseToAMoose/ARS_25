@@ -13,7 +13,7 @@ public class NeuralNetController : MonoBehaviour
     public Localizer Localizer;
     public AgentExperimentController ExperimentController;
     public MapBehaviour MapBehaviour;
-    
+
     public int localMapSize = 10;
 
 
@@ -137,24 +137,37 @@ public class NeuralNetController : MonoBehaviour
         // Calculate goal heading
         Vector3 goalPosition = ExperimentController.goalTransform.position;
         Vector2 goalPosition2D = new Vector2(goalPosition.x, goalPosition.z);
+
         Vector3 stateEstimate = Localizer.stateEstimate;
-        Vector2 estimatePosition = new Vector2(stateEstimate.y, stateEstimate.x);
-        float estimateAngle = stateEstimate.z * Mathf.Rad2Deg;
+        Vector2 estimatePosition = new Vector2(stateEstimate.y, stateEstimate.x); // (x, z) mapping
+
+         // Fix: Convert radians to degrees, flip clockwise to CCW, wrap to [0,360)
+        float estimateAngle = (360f - (stateEstimate.z * Mathf.Rad2Deg)) % 360f;
+
+        // Fix: Convert heading-from-Z to heading-from-X
+        float estimateAngleFromX = estimateAngle +90f;
+
         Vector2 goalDifferenceVector = goalPosition2D - estimatePosition;
         float distance = goalDifferenceVector.magnitude;
+
+        // Angle to goal from X+
         float beta = math.atan2(goalDifferenceVector.y, goalDifferenceVector.x) * Mathf.Rad2Deg;
-        float alpha = estimateAngle - beta + 90;
-        if (alpha > 180) alpha -= 360;
+
+        // Shortest signed angle between current heading and goal direction
+        float alpha = Mathf.DeltaAngle(estimateAngleFromX, beta);
 
         if (debug)
         {
-            Debug.Log("Estimate Angle: " + estimateAngle);
-            Debug.Log("Beta: " + beta);
+            Debug.Log("Estimate Angle (wrapped CCW): " + estimateAngle);
+            Debug.Log("Beta (to goal from X+): " + beta);
             Debug.Log("Distance to goal: " + distance);
-            Debug.Log("Angle to goal: " + alpha);
+            Debug.Log("Angle to goal (alpha): " + alpha);
         }
 
-        goalHeading = new[] { distance / mapSize.magnitude, alpha / 180 };
+        // Normalize for neural net input
+        goalHeading = new[] { distance / mapSize.magnitude, alpha / 180f };
+
+        // Debug.Log("Goal Vector: Radius{" + distance + "},Angle:{" + alpha + "}");
 
 
         // Set the nn input; goalHeading (2), position goal (2), pose estimate (3), lidarDistances (12), discretized map
@@ -216,7 +229,7 @@ public class NeuralNetController : MonoBehaviour
                         j >= esitimatePosY - localMapSize / 2 && j <= esitimatePosY + localMapSize / 2)
                     {
                         // Normalize the map value to be between 0 and 1
-                        input[count+ 21] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
+                        input[count + 21] = 1.0f - 1.0f / (1.0f + Mathf.Exp(map[i, j]));
 
                         count++;
                     }
