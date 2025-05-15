@@ -8,6 +8,7 @@ public class AgentExperimentController : MonoBehaviour
     public float goalThreshold = 1f;
 
     public RobotNavigationExperimentController ExperimentController;
+    public SingleAgentExperimentRunner SingleAgentExperimentRunner;
     public int AgentId { get; set; }
     
 
@@ -96,7 +97,8 @@ public class AgentExperimentController : MonoBehaviour
             FinalDistanceToGoal = finalDistance 
         };
 
-        ExperimentController.SubmitResult(result);
+        ExperimentController?.SubmitResult(result);
+        SingleAgentExperimentRunner?.SubmitResult(result);
     }
 
     void OnDrawGizmosSelected()
