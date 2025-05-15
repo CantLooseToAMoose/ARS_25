@@ -178,16 +178,17 @@ public class EvolutionExperimentManager : MonoBehaviour
 
         currentGeneration++;
 
-        if (currentGeneration % 100 == 0)
-        {
-            ExportBestIndividualToCSV($"best_weights_gen_{currentGeneration}.csv", bestOfCurrentGeneration, generationBestFitness);
-        }
-
         fitnessLog.Add(new FitnessLogEntry
         {
             Generation = currentGeneration,
             Fitnesses = new List<float>(fitnesses)
         });
+
+        if (currentGeneration % 50 == 0)
+        {
+            ExportBestIndividualToCSV($"best_weights_gen_{currentGeneration}.csv", bestOfCurrentGeneration, generationBestFitness);
+            ExportFitnessLogToCSV("fitness_log.csv");
+        }
 
         if (currentGeneration < maxGenerations)
         {
@@ -207,13 +208,13 @@ public class EvolutionExperimentManager : MonoBehaviour
         string path = System.IO.Path.Combine(Application.dataPath, filename);
         using (System.IO.StreamWriter writer = new System.IO.StreamWriter(path))
         {
-            writer.WriteLine("Generation,Fitness");
+            writer.WriteLine("Generation;Fitness");
 
             foreach (var entry in fitnessLog)
             {
                 foreach (var fitness in entry.Fitnesses)
                 {
-                    writer.WriteLine($"{entry.Generation},{fitness}");
+                    writer.WriteLine($"{entry.Generation};{fitness}");
                 }
             }
         }
